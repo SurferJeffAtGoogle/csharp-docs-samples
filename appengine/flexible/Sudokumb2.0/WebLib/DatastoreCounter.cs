@@ -168,7 +168,8 @@ namespace Sudokumb
         string GetCounterId(string keyName)
         {
             int colon = keyName.LastIndexOf(':');
-            return keyName.Substring(colon + 1);
+            string counterId = keyName.Substring(0, colon);
+            return counterId;
         }
 
         public async Task CondenseOldCounters(CancellationToken cancellationToken)
@@ -297,9 +298,11 @@ namespace Sudokumb
             CancellationToken cancellationToken)
         {
             _logger.LogInformation("DatastoreCounter.HostedServiceMainAsync()");
+            var rand = new Random();
             Dictionary<string, long> localCountersSnapshot
                 = new Dictionary<string, long>();
-            
+            DateTime nextCondense = DateTime.UtcNow.AddSeconds(rand.Next((int)                
+                _options.Value.CondenseFrequency.TotalSeconds * 2));
             while (true)
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -311,6 +314,12 @@ namespace Sudokumb
                     await Task.Delay(1000, cancellationToken);
                     await UpdateDatastoreFromLocalCountersAsync(
                         localCountersSnapshot, cancellationToken);
+                    DateTime now = DateTime.UtcNow;
+                    if (now > nextCondense) {
+                        await CondenseOldCounters(cancellationToken);
+                        nextCondense = DateTime.UtcNow.AddSeconds(rand.Next((int)                
+                            _options.Value.CondenseFrequency.TotalSeconds * 2));
+                    }
                 }
                 catch (Exception e)
                 when (!(e is OperationCanceledException))
