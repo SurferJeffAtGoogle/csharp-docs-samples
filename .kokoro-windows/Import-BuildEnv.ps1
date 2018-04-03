@@ -15,10 +15,16 @@
 Param ([switch]$Lint)
 
 # Download the contents of gs://cloud-devrel-kokoro-resources/dotnet-docs-samples.
-$tempfile = [System.IO.Path]::GetTempFileName()
-remove-item $tempfile
-new-item -type directory -path $tempfile
-$env:KOKORO_GFILE_DIR = $tempfile
+function New-TempDirectory {
+    $tempfile = [System.IO.Path]::GetTempFileName()
+    remove-item $tempfile
+    new-item -type directory -path $tempfile | Out-Null
+    return $tempFile
+}
+
+$env:KOKORO_GFILE_DIR = New-TempDirectory
+$env:INSTALL_DIR = New-TempDirectory
+
 gsutil cp gs://cloud-devrel-kokoro-resources/dotnet-docs-samples/* $env:KOKORO_GFILE_DIR
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -27,16 +33,16 @@ function Unzip([string]$zipfile, [string]$outpath)
     [System.IO.Compression.ZipFile]::ExtractToDirectory($zipfile, $outpath)
 }
 
-# Install codeformatter
-Unzip $env:KOKORO_GFILE_DIR\codeformatter.zip \codeformatter
-$codeformatterInstallPath = Resolve-Path \codeformatter
-$env:PATH = "$env:PATH;$codeformatterInstallPath\bin"
-
-# Add msbuild 14 to the path for for code-formatter.
-$env:PATH="$env:PATH;C:\Program Files (x86)\MSBuild\14.0\Bin"
-Get-Command MSBuild.exe
-
 if ($Lint) {
+    # Install codeformatter
+    Unzip $env:KOKORO_GFILE_DIR\codeformatter.zip $env:INSTALL_DIR\codeformatter
+    $codeformatterInstallPath = Resolve-Path $env:INSTALL_DIR\codeformatter
+    $env:PATH = "$codeformatterInstallPath\bin;$env:PATH"
+
+    # Add msbuild 14 to the path for for code-formatter.
+    $env:PATH="$env:PATH;C:\Program Files (x86)\MSBuild\14.0\Bin"
+    Get-Command MSBuild.exe -ErrorAction Stop
+
     # Lint the code
     Push-Location
     try {
@@ -49,24 +55,27 @@ if ($Lint) {
 }
 
 # Install phantomjs
-Unzip $env:KOKORO_GFILE_DIR\phantomjs-2.1.1-windows.zip \
-$env:PATH = "$env:PATH;$(Resolve-Path \phantomjs-2.1.1-windows)\bin"
+Unzip $env:KOKORO_GFILE_DIR\phantomjs-2.1.1-windows.zip $env:INSTALL_DIR
+$env:PATH="$env:INSTALL_DIR\phantomjs-2.1.1-windows\bin;$PATH"
 
 # Install casperjs
-Unzip $env:KOKORO_GFILE_DIR\n1k0-casperjs-1.0.3-0-g76fc831.zip \
-$casperJsInstallPath = Resolve-Path \n1k0-casperjs-76fc831
-$env:PATH = "$env:PATH;$casperJsInstallPath\batchbin"
+Unzip $env:KOKORO_GFILE_DIR\n1k0-casperjs-1.0.3-0-g76fc831.zip $env:INSTALL_DIR
+$casperJsInstallPath = Resolve-Path $env:INSTALL_DIR\n1k0-casperjs-76fc831
+$env:PATH = "$casperJsInstallPath\batchbin;$env:PATH"
 # Patch casperjs
-Copy-Item -Force github\dotnet-docs-samples\.kokoro\docker\bootstrap.js `
+Copy-Item -Force $PSScriptRoot\..\.kokoro\docker\bootstrap.js `
     $casperJsInstallPath\bin\bootstrap.js
 
 # Install casperjs 1.1
-Unzip $env:KOKORO_GFILE_DIR\casperjs-1.1.4-1.zip \
-$casperJsInstallPath = Resolve-Path \casperjs-1.1.4-1
+Unzip $env:KOKORO_GFILE_DIR\casperjs-1.1.4-1.zip $env:INSTALL_DIR
+$casperJsInstallPath = Resolve-Path $env:INSTALL_DIR\casperjs-1.1.4-1
 $env:CASPERJS11_BIN = "$casperJsInstallPath\bin"
 
 # Casperjs 1.1 needs python in the path.
-$env:PATH = "$env:PATH;C:\Python27"
+$pythonPath = (Get-Command python -ErrorAction SilentlyContinue).Source
+if (-not ) {
+    $env:PATH = "$env:PATH;C:\Python27"
+}
 
 # Install dotnet core sdk.
 choco install -y dotnetcore-sdk --version 2.0.0
