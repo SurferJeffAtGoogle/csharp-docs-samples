@@ -125,6 +125,18 @@ namespace GoogleCloudSamples
                     Policies = policyClient.ListAlertPolicies(projectName),
                     Channels = channelClient.ListNotificationChannels(projectName)
                 }, new ProtoMessageConverter()));
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            string ext = Path.GetExtension(filePath);
+            string dir = Path.GetDirectoryName(filePath);
+            string filePath2 = Path.Combine(dir, $"{fileName}-2{ext}");
+            // Intentionally f-up the proto.
+            File.WriteAllText(filePath2, JsonConvert.SerializeObject(
+                new BackupRecord()
+                {
+                    ProjectId = projectId,
+                    Policies = JsonConvert.DeserializeObject<IEnumerable<AlertPolicy>>(JsonConvert.SerializeObject(policyClient.ListAlertPolicies(projectName))),
+                    Channels = JsonConvert.DeserializeObject<IEnumerable<NotificationChannel>>(JsonConvert.SerializeObject(channelClient.ListNotificationChannels(projectName)))
+                }, new ProtoMessageConverter()));
         }
         // [END monitoring_alert_backup_policies]
 
@@ -242,43 +254,60 @@ namespace GoogleCloudSamples
             public IEnumerable<NotificationChannel> Channels { get; set; }
         }
 
-        /// <summary>
-        /// Lets Newtonsoft.Json and Protobuf's json converters play nicely
-        /// together.  The default Netwtonsoft.Json Deserialize method will
-        /// not correctly deserialize proto messages.
-        /// </summary>
-        class ProtoMessageConverter : JsonConverter
-        {
-            public override bool CanConvert(System.Type objectType)
-            {
-                return typeof(Google.Protobuf.IMessage)
-                    .IsAssignableFrom(objectType);
-            }
+/// <summary>
+/// Lets Newtonsoft.Json and Protobuf's json converters play nicely
+/// together.  The default Netwtonsoft.Json Deserialize method will
+/// not correctly deserialize proto messages.
+/// </summary>
+class ProtoMessageConverter : JsonConverter
+{
+    /// <summary>
+    /// Called by NewtonSoft.Json's method to ask if this object can serialize
+    /// an object of a given type.
+    /// </summary>
+    /// <returns>True if the objectType is a Protocol Message.</returns>
+    public override bool CanConvert(System.Type objectType)
+    {
+        return typeof(Google.Protobuf.IMessage)
+            .IsAssignableFrom(objectType);
+    }
 
-            public override object ReadJson(JsonReader reader,
-                System.Type objectType, object existingValue,
-                JsonSerializer serializer)
-            {
-                // Read an entire object from the reader.
-                var converter = new ExpandoObjectConverter();
-                object o = converter.ReadJson(reader, objectType, existingValue,
-                    serializer);
-                // Convert it back to json text.
-                string text = JsonConvert.SerializeObject(o);
-                // And let protobuf's parser parse the text.
-                IMessage message = (IMessage)Activator
-                    .CreateInstance(objectType);
-                return Google.Protobuf.JsonParser.Default.Parse(text,
-                    message.Descriptor);
-            }
+    /// <summary>
+    /// Reads the json representation of a Protocol Message and reconstructs
+    /// the Protocol Message.
+    /// </summary>
+    /// <param name="objectType">The Protocol Message type.</param>
+    /// <returns>An instance of objectType.</returns>
+    public override object ReadJson(JsonReader reader,
+        System.Type objectType, object existingValue,
+        JsonSerializer serializer)
+    {
+        // The only way to find where this json object begins and ends is by
+        // reading it in as a generic ExpandoObject.
+        // Read an entire object from the reader.
+        var converter = new ExpandoObjectConverter();
+        object o = converter.ReadJson(reader, objectType, existingValue,
+            serializer);
+        // Convert it back to json text.
+        string text = JsonConvert.SerializeObject(o);
+        // And let protobuf's parser parse the text.
+        IMessage message = (IMessage)Activator
+            .CreateInstance(objectType);
+        return Google.Protobuf.JsonParser.Default.Parse(text,
+            message.Descriptor);
+    }
 
-            public override void WriteJson(JsonWriter writer, object value,
-                JsonSerializer serializer)
-            {
-                writer.WriteRawValue(Google.Protobuf.JsonFormatter.Default
-                    .Format((IMessage)value));
-            }
-        }
+    /// <summary>
+    /// Writes the json representation of a Protocol Message.
+    /// </summary>
+    public override void WriteJson(JsonWriter writer, object value,
+        JsonSerializer serializer)
+    {
+        // Let Protobuf's JsonFormatter do all the work.
+        writer.WriteRawValue(Google.Protobuf.JsonFormatter.Default
+            .Format((IMessage)value));
+    }
+}
         // [END monitoring_alert_restore_policies]
         // [END monitoring_alert_backup_policies]
 

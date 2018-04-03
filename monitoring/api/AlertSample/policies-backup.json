@@ -1,0 +1,71 @@
+{
+    "ProjectId": "surferjeff-dpe",
+    "Policies": [
+        {
+            "name": "projects/surferjeff-dpe/alertPolicies/3476973723396150102",
+            "displayName": "No more than 10 instances.",
+            "combiner": "OR",
+            "creationRecord": {
+                "mutateTime": "2018-03-29T20:55:56.706452949Z",
+                "mutatedBy": "surferjeff@gmail.com"
+            },
+            "mutationRecord": {
+                "mutateTime": "2018-03-29T22:54:56.962659538Z",
+                "mutatedBy": "surferjeff@gmail.com"
+            },
+    "conditions": [
+        {
+            "conditionThreshold": {
+                "filter": "metric.type=\"appengine.googleapis.com/system/instance_count\" AND project=\"surferjeff-dpe\" AND resource.type=\"gae_app\"",
+                "comparison": "COMPARISON_GT",
+                "thresholdValue": 10,
+                "duration": "60s",
+                "trigger": {
+                    "count": 1
+                },
+                "aggregations": [
+                    {
+                        "alignmentPeriod": "60s",
+                        "perSeriesAligner": "ALIGN_MEAN",
+                        "crossSeriesReducer": "REDUCE_SUM",
+                        "groupByFields": [
+                            "project"
+                        ]
+                    }
+                ]
+            },
+            "displayName": "Metric Threshold on GAE App surferjeff-dpe",
+            "name": "projects/surferjeff-dpe/alertPolicies/3476973723396150102/conditions/3476973723396149803"
+        }
+    ],
+            "documentation": {
+                "content": "That's too many instances.",
+                "mimeType": "text/markdown"
+            },
+            "notificationChannels": [
+                "projects/surferjeff-dpe/notificationChannels/14105794518731126871",
+                "projects/surferjeff-dpe/notificationChannels/14680443906726695604"
+            ],
+            "enabled": true
+        }
+    ],
+    "Channels": [
+        {
+            "type": "email",
+            "labels": {
+                "email_address": "surferjeff@gmail.com"
+            },
+            "name": "projects/surferjeff-dpe/notificationChannels/14105794518731126871",
+            "enabled": true
+        },
+        {
+            "type": "sms",
+            "labels": {
+                "number": "+16502481886"
+            },
+            "name": "projects/surferjeff-dpe/notificationChannels/14680443906726695604",
+            "verificationStatus": "VERIFIED",
+            "enabled": true
+        }
+    ]
+}
