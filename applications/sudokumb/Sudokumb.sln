@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSolver", "WebSolver\WebS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebLib", "WebLib\WebLib.csproj", "{73AE2315-D1BD-4FC9-8A4B-0E01E3AAF47B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatastoreUserStoreTest", "DatastoreUserStoreTest\DatastoreUserStoreTest.csproj", "{6E13F407-F969-4B9A-A0AF-0137CA7E97D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -138,6 +140,18 @@ Global
 		{73AE2315-D1BD-4FC9-8A4B-0E01E3AAF47B}.Release|x64.Build.0 = Release|x64
 		{73AE2315-D1BD-4FC9-8A4B-0E01E3AAF47B}.Release|x86.ActiveCfg = Release|x86
 		{73AE2315-D1BD-4FC9-8A4B-0E01E3AAF47B}.Release|x86.Build.0 = Release|x86
+		{6E13F407-F969-4B9A-A0AF-0137CA7E97D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E13F407-F969-4B9A-A0AF-0137CA7E97D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E13F407-F969-4B9A-A0AF-0137CA7E97D3}.Debug|x64.ActiveCfg = Debug|x64
+		{6E13F407-F969-4B9A-A0AF-0137CA7E97D3}.Debug|x64.Build.0 = Debug|x64
+		{6E13F407-F969-4B9A-A0AF-0137CA7E97D3}.Debug|x86.ActiveCfg = Debug|x86
+		{6E13F407-F969-4B9A-A0AF-0137CA7E97D3}.Debug|x86.Build.0 = Debug|x86
+		{6E13F407-F969-4B9A-A0AF-0137CA7E97D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E13F407-F969-4B9A-A0AF-0137CA7E97D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E13F407-F969-4B9A-A0AF-0137CA7E97D3}.Release|x64.ActiveCfg = Release|x64
+		{6E13F407-F969-4B9A-A0AF-0137CA7E97D3}.Release|x64.Build.0 = Release|x64
+		{6E13F407-F969-4B9A-A0AF-0137CA7E97D3}.Release|x86.ActiveCfg = Release|x86
+		{6E13F407-F969-4B9A-A0AF-0137CA7E97D3}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
