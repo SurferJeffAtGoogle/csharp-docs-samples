@@ -122,8 +122,6 @@ namespace Sudokumb
         readonly IManagedTracer _tracer;
         ConcurrentDictionary<string, ICounter> _localCounters
              = new ConcurrentDictionary<string, ICounter>();
-        Dictionary<string, long> _localCountersSnapshot
-            = new Dictionary<string, long>();
 
         internal DatastoreCounter(DatastoreDb datastore,
             IOptions<DatastoreCounterOptions> options,
@@ -170,7 +168,8 @@ namespace Sudokumb
         string GetCounterId(string keyName)
         {
             int colon = keyName.LastIndexOf(':');
-            return keyName.Substring(colon + 1);
+            string counterId = keyName.Substring(0, colon);
+            return counterId;
         }
 
         public async Task CondenseOldCounters(CancellationToken cancellationToken)
@@ -265,18 +264,19 @@ namespace Sudokumb
             _localCounters.GetOrAdd(id,
                 (key) => (ICounter) new InterlockedCounter());
 
-        async Task UpdateDatastoreFromLocalCountersAsync(CancellationToken
-            cancellationToken)
+        async Task UpdateDatastoreFromLocalCountersAsync(
+            Dictionary<string, long> localCountersSnapshot,
+            CancellationToken cancellationToken)
         {
-            Dictionary<string, long> snapshot = new Dictionary<string, long>();
             List<Entity> entities = new List<Entity>();
             var now = DateTime.UtcNow;
             foreach (var keyValue in _localCounters)
             {
-                long count = snapshot[keyValue.Key] = keyValue.Value.Count;
-                if (count != _localCountersSnapshot
+                long count = keyValue.Value.Count;
+                if (count != localCountersSnapshot
                     .GetValueOrDefault(keyValue.Key))
                 {
+                    localCountersSnapshot[keyValue.Key] = count;
                     var entity = new Entity()
                     {
                         Key = _keyFactory.CreateKey($"{keyValue.Key}:{_shard}"),
@@ -291,7 +291,6 @@ namespace Sudokumb
             {
                 await _datastore.UpsertAsync(entities, CallSettings
                     .FromCancellationToken(cancellationToken));
-                _localCountersSnapshot = snapshot;
             }
         }
 
@@ -299,6 +298,11 @@ namespace Sudokumb
             CancellationToken cancellationToken)
         {
             _logger.LogInformation("DatastoreCounter.HostedServiceMainAsync()");
+            var rand = new Random();
+            Dictionary<string, long> localCountersSnapshot
+                = new Dictionary<string, long>();
+            DateTime nextCondense = DateTime.UtcNow.AddSeconds(rand.Next((int)                
+                _options.Value.CondenseFrequency.TotalSeconds * 2));
             while (true)
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -309,7 +313,13 @@ namespace Sudokumb
                 {
                     await Task.Delay(1000, cancellationToken);
                     await UpdateDatastoreFromLocalCountersAsync(
-                        cancellationToken);
+                        localCountersSnapshot, cancellationToken);
+                    DateTime now = DateTime.UtcNow;
+                    if (now > nextCondense) {
+                        await CondenseOldCounters(cancellationToken);
+                        nextCondense = DateTime.UtcNow.AddSeconds(rand.Next((int)                
+                            _options.Value.CondenseFrequency.TotalSeconds * 2));
+                    }
                 }
                 catch (Exception e)
                 when (!(e is OperationCanceledException))
