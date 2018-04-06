@@ -71,7 +71,7 @@ namespace WebApp
                 Configuration.GetSection("Google"));
             services.AddSingleton<DatastoreDb>(provider => DatastoreDb.Create(
                 Configuration["Google:ProjectId"],
-            Configuration["Google:NamespaceId"] ?? ""));
+                Configuration["Google:NamespaceId"] ?? ""));
             services.Configure<KmsDataProtectionProviderOptions>(
                 Configuration.GetSection("Google"));
             services.AddIdentity<ApplicationUser, IdentityRole>()
