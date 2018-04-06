@@ -71,7 +71,7 @@ casper.test.begin('Submit puzzle', 3, function suite(test) {
         this.echo("Yeah, it's really solving.");
     }, function() {
         test.fail("Never updated solving status message.");
-    }, 4000);
+    }, 10000);
     
     casper.run(function () {
         test.done();
