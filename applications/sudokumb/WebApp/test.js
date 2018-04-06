@@ -102,3 +102,65 @@ casper.test.begin('Submit puzzle', 3, function suite(test) {
         test.done();
     });
 });
+
+casper.test.begin('Register user and login.', 13, function suite(test) {
+    // Register a new user.
+    casper.start(host + '/').thenClick('#nav-register', function(response) {
+        this.echo('Visiting ' + response.url);        
+        test.assertEquals(200, response.status);
+        test.assertSelectorHasText('title', 'Register - Sudokumb');
+        // Fill the form.
+        this.fill('form', {
+            'Email': 'joe@example.com',
+            'Password': ',byc;sC3',
+            'ConfirmPassword': ',byc;sC3',
+        }, false);
+    });
+
+    casper.thenClick('button[type="submit"]', function (response) {
+        this.echo('Visiting ' + response.url);        
+        test.assertEquals(200, response.status);
+        test.assertSelectorHasText('a[title="Manage"]', 'Hello joe@example.com!');        
+    });
+
+    // Log out.
+    casper.thenClick('#nav-logout', function (response) {
+        this.echo('Visiting ' + response.url);        
+        test.assertEquals(200, response.status);
+        test.assertSelectorDoesntHaveText('a[title="Manage"]', 'Hello joe@example.com!');        
+    });
+    
+    // Try logging in with the wrong password.
+    casper.thenClick('#nav-login', function (response) {
+        this.echo('Visiting ' + response.url);        
+        test.assertEquals(200, response.status);
+        test.assertSelectorHasText('title', 'Log in - Sudokumb');        
+        this.fill('form', {
+            'Email': 'joe@example.com',
+            'Password': 'notmypassword',
+        }, false);
+    });
+
+    casper.thenClick('button[type="submit"]', function (response) {
+        this.echo('Visiting ' + response.url);        
+        test.assertEquals(200, response.status);
+        test.assertSelectorHasText('div.validation-summary-errors li', 'Invalid login attempt.');
+
+        // And log in with the right password.
+        test.assertSelectorHasText('title', 'Log in - Sudokumb');        
+        this.fill('form', {
+            'Email': 'joe@example.com',
+            'Password': ',byc;sC3',
+        }, false);
+    });
+
+    casper.thenClick('button[type="submit"]', function (response) {
+        this.echo('Visiting ' + response.url);        
+        test.assertEquals(200, response.status);
+        test.assertSelectorHasText('a[title="Manage"]', 'Hello joe@example.com!');        
+    });
+
+    casper.run(function () {
+        test.done();
+    });
+});
