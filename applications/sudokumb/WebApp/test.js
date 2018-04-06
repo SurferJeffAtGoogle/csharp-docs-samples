@@ -49,31 +49,6 @@ casper.test.begin('Visit pages.', 10, function suite(test) {
         test.assertSelectorHasText('title', 'Solve - Sudokumb');
     });
     
-    /*
-    casper.thenClick('#Submit', function (response) {
-        this.echo('Submitted form.');
-        test.assertEquals(200, response.status);
-        test.assertSelectorHasText('#LastIncrementedBy', 'test.js');
-        test.assertSelectorHasText('#CurrentCount', currentCount + 1);
-        this.fill('#WhoForm', {
-            'Who': 'anothertest.js',
-        }, false);
-        this.echo("Filled another form.");
-    });
-
-    casper.thenClick('#Submit', function (response) {
-        this.echo('Submitted form.');
-        test.assertEquals(200, response.status);
-        test.assertSelectorHasText('#LastIncrementedBy', 'anothertest.js');
-    });
-
-    casper.thenClick('#Reset', function (response) {
-        this.echo('Clicked Reset.');
-        test.assertEquals(200, response.status);
-        test.assertSelectorHasText('#CurrentCount', '0');
-    });
-    */
-
     casper.run(function () {
         test.done();
     });
