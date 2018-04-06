@@ -52,7 +52,7 @@ if (-not $SkipDownloadKokoroDir) {
     $env:KOKORO_GFILE_DIR = Join-Path $Dir 'kokoro'
     (New-Item -Path $env:KOKORO_GFILE_DIR -ItemType Directory -Force).FullName
     # Copy all the files from our kokoro secrets bucket.
-    gsutil cp gs://cloud-devrel-kokoro-resources/dotnet-docs-samples/* $env:KOKORO_GFILE_DIR
+    gsutil -m cp gs://cloud-devrel-kokoro-resources/dotnet-docs-samples/* $env:KOKORO_GFILE_DIR
 }
 
 # Prepare to unzip the files.
@@ -66,7 +66,7 @@ Set-PsDebug -Trace 1
 # Install codeformatter
 Unzip $env:KOKORO_GFILE_DIR/codeformatter.zip $installDir/codeformatter
 # Install phantomjs
-Unzip $env:KOKORO_GFILE_DIR/phantomjs-2.1.1-windows.zip $installDir
+Unzip $env:KOKORO_GFILE_DIR/phantomjs-1.9.8-windows.zip $installDir
 # Install casperjs
 Unzip $env:KOKORO_GFILE_DIR/n1k0-casperjs-1.0.3-0-g76fc831.zip $installDir
 # Patch casperjs
