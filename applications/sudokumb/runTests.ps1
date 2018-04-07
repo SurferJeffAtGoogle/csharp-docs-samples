@@ -25,7 +25,7 @@ BackupAndEdit-TextFile "WebApp/appsettings.json" `
 	Push-Location .
 	try {
 		Set-Location WebApp
-		Run-KestrelTest 5510 -CasperJs11
+		Run-KestrelTest 5510 -CasperJs11 -LeaveRunning
 	} finally {
 		Pop-Location
 		dotnet run --no-restore --no-build --project 'Remove-DatastoreNamespace/Remove-DatastoreNamespace.csproj' `

@@ -1,15 +1,25 @@
 # $ docker build -t gcr.io/cloud-devrel-kokoro-resources/dotnet .
 # $ gcloud docker -- push gcr.io/cloud-devrel-kokoro-resources/dotnet
 
-# start with a powershell image.
-FROM microsoft/powershell
+# start with a selenium image
+FROM selenium/standalone-chrome
+USER root
+
+# Install curl
+RUN apt-get update; apt-get install -y curl
+
+# Install powershell
+# Import the public repository GPG keys
+RUN apt-get install apt-transport-https
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+# Register the Microsoft Ubuntu repository
+RUN curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list | tee /etc/apt/sources.list.d/microsoft.list
+# Update the list of products
+RUN apt-get update
+# Install PowerShell
+RUN apt-get install -y powershell
 
 # install dotnet core sdk.
-# steps from https://www.microsoft.com/net/core#linuxubuntu
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
-RUN mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
-RUN sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-xenial-prod xenial main" > /etc/apt/sources.list.d/dotnetdev.list'
-RUN apt-get -y update
 RUN apt-get -y install dotnet-sdk-2.0.0 dotnet-dev-1.1.4
 
 # install phantomjs
@@ -39,3 +49,5 @@ RUN apt-get install git vim -y
 
 # install GDI+ API compatible implementation for cross-plaform System.Drawing
 RUN apt-get install libgdiplus -y
+
+ENTRYPOINT [ "usr/bin/pwsh" ]
