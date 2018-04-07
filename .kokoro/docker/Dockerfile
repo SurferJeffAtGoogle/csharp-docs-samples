@@ -50,4 +50,4 @@ RUN apt-get install git vim -y
 # install GDI+ API compatible implementation for cross-plaform System.Drawing
 RUN apt-get install libgdiplus -y
 
-ENTRYPOINT [ "usr/bin/pwsh" ]
+ENTRYPOINT [ "/usr/bin/pwsh" ]
