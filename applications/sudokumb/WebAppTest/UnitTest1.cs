@@ -17,7 +17,8 @@ namespace WebAppTest
         public IWebDriver WebDriver { get; private set; }
         public WebDriverTestFixture()
         {
-            WebDriver = new ChromeDriver();
+            WebDriver = new ChromeDriver(ChromeDriverService.CreateDefaultService(),
+                new ChromeOptions(), TimeSpan.FromMinutes(3));                
         }
 
         public void Dispose()
