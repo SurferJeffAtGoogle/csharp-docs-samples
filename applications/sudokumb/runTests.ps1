@@ -40,7 +40,7 @@ BackupAndEdit-TextFile @("WebApp/appsettings.json",
 		$webAppJob = Run-Kestrel $url
 		# Launch the test.
 		Set-Location ../WebAppTest
-		dotnet test --no-restore --no-build -v n
+		dotnet test --no-restore --no-build -v n --test-adapter-path:. --logger:junit
 		if ($LASTEXITCODE) {
 			throw "TEST FAILED."
 		}

@@ -32,7 +32,7 @@ namespace Sudokumb
         private readonly ITestOutputHelper output;
         private readonly IWebDriver browser;
 
-        public UnitTest1(ITestOutputHelper output, WebDriverTestFixture fixture)
+        public WebAppTest(ITestOutputHelper output, WebDriverTestFixture fixture)
         {
             this.output = output;
             this.browser = fixture.WebDriver;
