@@ -724,7 +724,7 @@ function Run-Kestrel([Parameter(mandatory=$true)][string]$url)
             }
         }
         $seconds++
-        if ($seconds > 120) {
+        if ($seconds -gt 120) {
             throw "Kestrel took > 120 seconds to start up."
         }
     }
