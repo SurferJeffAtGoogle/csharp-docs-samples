@@ -291,8 +291,15 @@ namespace Sudokumb
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            return _subscriberClient.StartAsync(
+            Task.Run(async() =>
+            {
+                // This potentially hammers the CPU, so wait until everything
+                // else starts up.
+                await Task.Delay(TimeSpan.FromSeconds(10));
+                await _subscriberClient.StartAsync(
                     (message, token) => ProcessOneMessage(message, token));
+            });
+            return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken) =>
