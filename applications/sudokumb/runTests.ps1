@@ -32,16 +32,17 @@ BackupAndEdit-TextFile @("WebApp/appsettings.json",
 	$portNumber = 5510
 	$url = "http://localhost:$portNumber"
 	try {
-		# Launch WebApp.
-		Set-Location WebApp
-		$webAppJob = Run-Kestrel $url
 		# Launch WebSolver.
-		Set-Location ../WebSolver
+		Set-Location WebSolver
 		$webSolverJob = Run-Kestrel "http://localhost:5511"
+		# Launch WebApp.
+		Set-Location ../WebApp
+		$webAppJob = Run-Kestrel $url
 	} finally {
 		# Stop the kestrel jobs.
-		if ($webAppJob -or $webSolverJob) {
-			@($webSolverJob, $webAppJob) | Stop-Job
+		foreach ($job in @($webAppJob, $webSolverJob)) {
+			Stop-Job $job
+			Receive-Job $job
 		}
 		# Clean up datastore.
 		Pop-Location
