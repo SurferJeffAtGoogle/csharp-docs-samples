@@ -38,6 +38,12 @@ BackupAndEdit-TextFile @("WebApp/appsettings.json",
 		# Launch WebApp.
 		Set-Location ../WebApp
 		$webAppJob = Run-Kestrel $url
+		# Launch the test.
+		Set-Location ../WebAppTest
+		dotnet test --no-restore --no-build -v n
+		if ($LASTEXITCODE) {
+			throw "TEST FAILED."
+		}
 	} finally {
 		# Stop the kestrel jobs.
 		foreach ($job in @($webAppJob, $webSolverJob)) {
