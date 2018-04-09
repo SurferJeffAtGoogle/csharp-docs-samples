@@ -1,7 +1,5 @@
 FROM gcr.io/cloud-devrel-kokoro-resources/dotnet:latest
 
-RUN apt-get install git
-
 ARG KOKORO_GFILE_DIR
 
 # Copy secrets from kokoro gfile.
