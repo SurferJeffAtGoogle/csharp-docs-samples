@@ -14,19 +14,36 @@
 
 Import-Module -DisableNameChecking ..\..\BuildTools.psm1
 
+Require-Platform Win*
+
 $randomNamespace = "sudokumb-test-" + (-join (1..20 | foreach {[char] (97 + (Get-Random 26)) }))
 
 dotnet restore Sudokumb.sln
-BackupAndEdit-TextFile "WebApp/appsettings.json" `
+BackupAndEdit-TextFile @("WebApp/appsettings.json", 
+						 "WebSolver/appsettings.json") `
 	@{"YOUR-PROJECT-ID" = $env:GOOGLE_PROJECT_ID;
 	  "sudokumb" = $randomNamespace} `
 {
 	dotnet build Sudokumb.sln
+	if ($LASTEXITCODE) {
+		throw "Build failed."
+	}
 	Push-Location .
+	$portNumber = 5510
+	$url = "http://localhost:$portNumber"
 	try {
+		# Launch WebSolver.
+		Set-Location ../WebSolver
+		$webSolverJob = Run-Kestrel "http://localhost:5511"
+		# Launch WebApp.
 		Set-Location WebApp
-		Run-KestrelTest 5510 -CasperJs11 -LeaveRunning
+		$webAppJob = Run-Kestrel $url
 	} finally {
+		# Stop the kestrel jobs.
+		if ($webAppJob -or $webSolverJob) {
+			@($webSolverJob, $webAppJob) | Stop-Job
+		}
+		# Clean up datastore.
 		Pop-Location
 		dotnet run --no-restore --no-build --project 'Remove-DatastoreNamespace/Remove-DatastoreNamespace.csproj' `
 			-- -p $env:GOOGLE_PROJECT_ID -n $randomNamespace

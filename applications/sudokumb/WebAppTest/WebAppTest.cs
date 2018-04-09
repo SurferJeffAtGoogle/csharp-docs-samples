@@ -4,7 +4,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using Xunit.Abstractions;
 
-namespace WebAppTest
+namespace Sudokumb
 {
     static class Extensions
     {
@@ -27,7 +27,7 @@ namespace WebAppTest
         }
     }
 
-    public class UnitTest1 : IClassFixture<WebDriverTestFixture>
+    public class WebAppTest : IClassFixture<WebDriverTestFixture>
     {
         private readonly ITestOutputHelper output;
         private readonly IWebDriver browser;
