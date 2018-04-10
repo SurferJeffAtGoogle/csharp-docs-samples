@@ -59,14 +59,16 @@
         <h2>Smart</h2>
         <dl>
             <dt>
+                <img src="http://cloud.google.com/_static/images/cloud/products/logos/svg/datastore.svg"
+                    width=64/>
                 Sudokumb stores user info in Datastore.
             </dt>
             <dd>
-                <img src="http://cloud.google.com/_static/images/cloud/products/logos/svg/datastore.svg"
-                     width=64/>
-                Sudokumb implements a <a href="https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-custom-storage-providers">
-                custom storage provider for identity</a> to
-                store user names, password hashes, etc. in <a href="https://cloud.google.com/datastore/">Google Cloud Datastore.</a>
+                Sudokumb stores user information like email addresses and passwords in 
+                <a href="https://cloud.google.com/datastore/">Google Cloud Datastore></a>.
+                To do so, it implements a <a 
+                    href="https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-custom-storage-providers">
+                custom storage provider for identity</a>.
             </dd>
             <dd>
                 <a href="https://cloud.google.com/datastore/">Google Cloud Datastore</a>
@@ -84,12 +86,17 @@
             </dd>
 
             <dt>
-                Sudokumb logs and reports errors to Stackdriver.
-            </dt>
-            <dd>
                 <img src="http://cloud.google.com/_static/images/cloud/products/logos/svg/stackdriver.svg"
                      width=64/>
-                TODO: add content here.
+                Sudokumb logs and reports errors and traces to Stackdriver.
+            </dt>
+            <dd>
+                When an exception is thrown in production, the critical information like the stack trace
+                is hidden.
+                <img src="/images/Error.png">
+            <dd>                
+                Stackdriver collects that information for you and renders it to a searchable database:
+                <img src="/images/ErrorReport.png">
             </dd>
 
             <dt>
