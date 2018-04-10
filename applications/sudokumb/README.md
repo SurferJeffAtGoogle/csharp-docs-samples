@@ -2,7 +2,7 @@
 
 This is the companion sample for number of [medium.com stories](https://medium.com/@SurferJeff).
 
-**Sudokumb** is a [Sudoku](https://en.wikipedia.org/wiki/Sudoku) solver. In order to demonstrate some cool features of <a href="https://cloud.google.com/">Google Cloud Platform <img src="http://cloud.google.com/_static/images/cloud/products/logos/svg/gcp.svg" style="width: 32px;"></a>,
+**Sudokumb** is a [Sudoku](https://en.wikipedia.org/wiki/Sudoku) solver. In order to demonstrate some cool features of <a href="https://cloud.google.com/">Google Cloud Platform <img src="http://cloud.google.com/_static/images/cloud/products/logos/svg/gcp.svg" width="32"></a>,
 Sudokumb solves the puzzles in a very dumb way. But some things it does are actually pretty smart.
 
 ## Smart
