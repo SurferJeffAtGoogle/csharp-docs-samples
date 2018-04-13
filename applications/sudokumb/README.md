@@ -46,57 +46,65 @@ Most of what Sudokumb does is actually pretty smart.
     to enable the Google Stackdriver Cloud Pub/Sub API for your project.
 
 5.  [Click here](https://console.cloud.google.com/flows/enableapi?apiid=cloudkms.googleapis.com&showconfirmation=true) 
-	to enable Google Cloud Key Management Service for your project.
+    to enable Google Cloud Key Management Service for your project.
 
 
 6.  Edit [`WebApp/appsettings.json`](WebApp/appsettings.json).
 
-	Replace `YOUR-PROJECT-ID` with your Google project id.
+    Replace `YOUR-PROJECT-ID` with your Google project id.
 
 7.  Edit [`WebSolver/appsettings.json`](WebSolver/appsettings.json).
 
-	Replace `YOUR-PROJECT-ID` with your Google project id.
+    Replace `YOUR-PROJECT-ID` with your Google project id.
 
 ## ![PowerShell](../../appengine/flexible/.resources/powershell.png) Using PowerShell
 
 ### Run Locally
 
 1.	To run locally, run the WebApp and the WebSolver:
-	```powershell
-	PS > dotnet run -p WebApp/WebApp.csproj
-	Hosting environment: Production
-	Content root path: /usr/local/google/home/<redacted>/gitrepos/dotnet-docs-samples/applications/sudokumb/WebApp
-	Now listening on: http://localhost:5000
-	Application started. Press Ctrl+C to shut down.
-	```
+    ```powershell
+    PS > dotnet run -p WebApp/WebApp.csproj
+    Hosting environment: Production
+    Content root path: /usr/local/google/home/<redacted>/gitrepos/dotnet-docs-samples/applications/sudokumb/WebApp
+    Now listening on: http://localhost:5000
+    Application started. Press Ctrl+C to shut down.
+    ```
 
 2.	In a separate window:
-	```powershell
-	PS > $env:ASPNETCORE_URLS = 'http://localhost:5001'
-	PS > dotnet run -p WebSolver/WebSolver.csproj
-	Hosting environment: Production
-	Content root path: /usr/local/google/home/<redacted>/gitrepos/dotnet-docs-samples/applications/sudokumb/WebSolver
-	Now listening on: http://localhost:5001
-	Application started. Press Ctrl+C to shut down.
-	```
+    ```powershell
+    PS > $env:ASPNETCORE_URLS = 'http://localhost:5001'
+    PS > dotnet run -p WebSolver/WebSolver.csproj
+    Hosting environment: Production
+    Content root path: /usr/local/google/home/<redacted>/gitrepos/dotnet-docs-samples/applications/sudokumb/WebSolver
+    Now listening on: http://localhost:5001
+    Application started. Press Ctrl+C to shut down.
+    ```
 ### Deploy to App Engine
 
-0.  Install the [Google Cloud SDK](http://cloud.google.com/sdk).
+1.  Install the [Google Cloud SDK](http://cloud.google.com/sdk).
 
-1.	Publish the projects:
-	```
-	PS > dotnet publish -c Release Sudokumb.sln
-	```
+2.  [Click here](https://console.cloud.google.com/appengine) to create an
+    App Engine Application.
+
+3.  Run the script to add Kms Permissions to the App Engine service account:
+    ```powershell
+    PS> .\Add-KmsPermissionsToAppEngine
+    ```
+    
+2.	Publish the projects:
+    ```powershell
+    PS > dotnet publish -c Release Sudokumb.sln
+    ```
 
 2.  Deploy WebApp with `gcloud`:
-	```
-	PS > gcloud beta app deploy WebApp/bin/Debug/netcoreapp2.0/publish/app.yaml
-	```
+    ```powershell
+    PS > gcloud beta app deploy WebApp/bin/Release/netcoreapp2.0/publish/app.yaml
+    ```
 
 3.  Deploy WebSolver with `gcloud`:
-	```
-	PS > gcloud beta app deploy WebSolver/bin/Debug/netcoreapp2.0/publish/app.yaml
-	```
+    ```powershell
+    PS > gcloud beta app deploy WebSolver/bin/Release/netcoreapp2.0/publish/app.yaml
+    ```
 
 
 ## ![Visual Studio](../../appengine/flexible/.resources/visual-studio.png) Using Visual Studio
@@ -106,9 +114,9 @@ Most of what Sudokumb does is actually pretty smart.
 6.  Before deploying to app engine, you must copy your user secrets to your Google
 project metadata with this powershell script:
 
-	```psm1
-	PS C:\dotnet-docs-samples\appengine\flexible\SocialAuth> .\Upload-UserSecrets
-	```
+    ```psm1
+    PS C:\dotnet-docs-samples\appengine\flexible\SocialAuth> .\Upload-UserSecrets
+    ```
 
 Open **SocialAuth.csproj**, and Press **F5**.
 
