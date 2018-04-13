@@ -45,7 +45,7 @@ namespace WebApp
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services, IHostingEnvironment env)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddOptions();
 
@@ -64,7 +64,6 @@ namespace WebApp
                     bufferOptions: Google.Cloud.Diagnostics.Common.BufferOptions.NoBuffer());
             });
 
-
             services.Configure<Models.AccountViewModels.AccountOptions>(
                 Configuration.GetSection("Account"));
             services.Configure<PubsubGameBoardQueueOptions>(
@@ -72,13 +71,8 @@ namespace WebApp
             services.AddSingleton<DatastoreDb>(provider => DatastoreDb.Create(
                 Configuration["Google:ProjectId"],
                 Configuration["Google:NamespaceId"] ?? ""));
-            if (!env.IsDevelopment())
-            {
-                services.Configure<KmsDataProtectionProviderOptions>(
-                    Configuration.GetSection("Google"));
-                services.AddSingleton<IDataProtectionProvider,
-                    KmsDataProtectionProvider>();
-            }
+            services.Configure<KmsDataProtectionProviderOptions>(
+                Configuration.GetSection("Google"));
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddDefaultTokenProviders();
             services.AddTransient<IUserStore<ApplicationUser>,
@@ -92,6 +86,8 @@ namespace WebApp
             services.AddSingleton<IGameBoardQueue, PubsubGameBoardQueue>();
             services.AddAdminSettings();
             services.AddTransient<IEmailSender, EmailSender>();
+            services.AddSingleton<IDataProtectionProvider,
+                KmsDataProtectionProvider>();
 
             services.AddMvc();
         }
