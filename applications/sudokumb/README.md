@@ -111,18 +111,21 @@ Most of what Sudokumb does is actually pretty smart.
 
 ### Run Locally
 
-6.  Before deploying to app engine, you must copy your user secrets to your Google
-project metadata with this powershell script:
+1.  Open ***Sudokumb.sln**.
 
-    ```psm1
-    PS C:\dotnet-docs-samples\appengine\flexible\SocialAuth> .\Upload-UserSecrets
-    ```
+2.  In the **Solution Explorer** window, right-click the **Sudokumb** project 
+    and choose **Set StartUp Projects...".
 
-Open **SocialAuth.csproj**, and Press **F5**.
+3.  Click **Multiple startup projects:**.  Change the **Action** from **None**
+    to **Start** for the projects **WebApp** and **WebSolver**.
+
+4.  Click **OK** to close the **Solution 'Sudokumb' Propert Pages** window.
+
+5.  Press the **F5** key to run. 
 
 ### Deploy to App Engine
 
-1.  In Solution Explorer, right-click the **SocialAuth** project and choose **Publish SocialAuth to Google Cloud**.
+1.  In the **Solution Explorer** window, right-click the **Sudokumb** project and choose **Publish SocialAuth to Google Cloud**.
 
 2.  Click **App Engine Flex**.
 
