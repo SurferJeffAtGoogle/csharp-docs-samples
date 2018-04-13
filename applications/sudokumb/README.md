@@ -27,10 +27,10 @@ Stackdriver collects details about every exception in a searchable database:
 ![](./WebApp/wwwroot/images/ErrorReport.png)
 
 Stackdriver also collects all your logs into a searchable database:
-![](./WebApp/wwwrooot/images/Logging.png)
+![](./WebApp/wwwroot/images/Logging.png)
 
 And stackdriver can show you trace information too:
-![](./WebApp/wwwrooot/images/Trace.png)
+![](./WebApp/wwwroot/images/Trace.png)
 
 
 
