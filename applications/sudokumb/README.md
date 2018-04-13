@@ -125,8 +125,18 @@ Most of what Sudokumb does is actually pretty smart.
 
 ### Deploy to App Engine
 
-1.  In the **Solution Explorer** window, right-click the **Sudokumb** project and choose **Publish SocialAuth to Google Cloud**.
+1.  Install the [Google Cloud SDK](http://cloud.google.com/sdk).
 
-2.  Click **App Engine Flex**.
+2.  Install [Google Cloud Tools for Visual Studio](https://cloud.google.com/visual-studio/).
 
-3.  Click **Publish**.
+3.  In the **Solution Explorer** window, right-click the **WebApp** project and choose **Publish Google Cloud...**.
+
+4.  Click **App Engine Flex**.
+
+5.  Click **Publish**.
+
+3.  In the **Solution Explorer** window, right-click the **WebSolver** project and choose **Publish Google Cloud...**.
+
+4.  Click **App Engine Flex**.
+
+5.  Click **Publish**.
