@@ -55,7 +55,7 @@ Most of what Sudokumb does is actually pretty smart.
 
 	Replace `YOUR-PROJECT-ID` with your Google project id.
 
-4.  Edit [`WebSolver/appsettings.json`](WebApp/solver.json).
+4.  Edit [`WebSolver/appsettings.json`](WebAppSolver/appsettings.json).
 
 	Replace `YOUR-PROJECT-ID` with your Google project id.
 
