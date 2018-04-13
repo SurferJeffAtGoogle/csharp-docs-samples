@@ -49,20 +49,13 @@ Most of what Sudokumb does is actually pretty smart.
 	to enable Google Cloud Key Management Service for your project.
 
 
-## Building
-
-3.  Edit [`WebApp/appsettings.json`](WebApp/appsettings.json).
+6.  Edit [`WebApp/appsettings.json`](WebApp/appsettings.json).
 
 	Replace `YOUR-PROJECT-ID` with your Google project id.
 
-4.  Edit [`WebSolver/appsettings.json`](WebSolver/appsettings.json).
+7.  Edit [`WebSolver/appsettings.json`](WebSolver/appsettings.json).
 
 	Replace `YOUR-PROJECT-ID` with your Google project id.
-
-5.  Build:
-	```powershell
-	PS > dotnet build Sudokumb.sln
-	```
 
 ## ![PowerShell](../../appengine/flexible/.resources/powershell.png) Using PowerShell
 
