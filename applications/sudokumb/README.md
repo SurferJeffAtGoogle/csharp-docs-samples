@@ -11,25 +11,25 @@ Most of what Sudokumb does is actually pretty smart.
 
 ### <img src="http://cloud.google.com/_static/images/cloud/products/logos/svg/datastore.svg" width=64> Sudokumb stores user info in [Datastore](https://cloud.google.com/datastore/).
 
-[Learn more](./DatastoreUserStore/README.md).
+[Learn how](./DatastoreUserStore/README.md).
 
 ### <img src="http://cloud.google.com/_static/images/cloud/products/logos/svg/stackdriver.svg" width=64> Sudokumb logs and reports errors and traces to [Stackdriver](https://cloud.google.com/dotnet/docs/stackdriver).
 
-[Learn more](./Stackdriver.md).
+[Learn how](./Stackdriver.md).
 
 ### <img src="http://cloud.google.com/_static/images/cloud/products/logos/svg/kms.svg" width=64> Sudokumb secures forms and cookies with [Key Management Service](https://cloud.google.com/kms/)
 
-[Learn more](./KmsDataProtectionProvider/README.md).
+[Learn how](./KmsDataProtectionProvider/README.md).
 
 ### <img src="http://cloud.google.com/_static/images/cloud/products/logos/svg/appengine.svg" width=64> Sudokumb automatically scales on [App Engine](https://cloud.google.com/appengine/docs/flexible/dotnet/).
 
-[Learn more](./AppEngine.md).
+[Learn how](./AppEngine.md).
 
 ## Dumb
 
 ### <img src="http://cloud.google.com/_static/images/cloud/products/logos/svg/pubsub.svg" width=64> Sudokumb distributes tiny fragments of work via [Google Cloud Pub/Sub](https://cloud.google.com/pubsub/docs/)
 
-[Learn more](./WebLib/PubSub.md).
+[Learn how](./WebLib/PubSub.md).
 
 # Building and Running locally.
 
