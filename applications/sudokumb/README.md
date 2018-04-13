@@ -9,11 +9,11 @@ Sudokumb solves the puzzles in a very dumb way.
 
 Most of what Sudokumb does is actually pretty smart.
 
-### <img src="http://cloud.google.com/_static/images/cloud/products/logos/svg/datastore.svg" width=64> Sudokumb stores user info in Datastore.
+### <img src="http://cloud.google.com/_static/images/cloud/products/logos/svg/datastore.svg" width=64> Sudokumb stores user info in [Datastore](https://cloud.google.com/datastore/).
 
 [Learn more](./DatastoreUserStore/README.md).
 
-### <img src="http://cloud.google.com/_static/images/cloud/products/logos/svg/stackdriver.svg" width=64> Sudokumb logs and reports errors and traces to Stackdriver.
+### <img src="http://cloud.google.com/_static/images/cloud/products/logos/svg/stackdriver.svg" width=64> Sudokumb logs and reports errors and traces to [Stackdriver](https://cloud.google.com/dotnet/docs/stackdriver).
 
 [Learn more](./Stackdriver.md).
 
