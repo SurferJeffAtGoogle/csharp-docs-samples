@@ -64,7 +64,7 @@ Most of what Sudokumb does is actually pretty smart.
 	PS > dotnet build Sudokumb.sln
 	```
 
-## ![PowerShell](../../.resources/powershell.png) Using PowerShell
+## ![PowerShell](../../appengine/flexible/.resources/powershell.png) Using PowerShell
 
 ### Run Locally
 
@@ -106,7 +106,7 @@ Most of what Sudokumb does is actually pretty smart.
 	```
 
 
-## ![Visual Studio](../../.resources/visual-studio.png) Using Visual Studio
+## ![Visual Studio](../../appengine/flexible/.resources/visual-studio.png) Using Visual Studio
 
 ### Run Locally
 
