@@ -24,6 +24,7 @@ namespace GoogleCloudSamples
 {
     public class DialogflowTest
     {
+        protected RetryRobot _retryRobot = new RetryRobot();
         public readonly string ProjectId = Environment.GetEnvironmentVariable("GOOGLE_PROJECT_ID");
         public readonly string SessionId = TestUtil.RandomName();
 
@@ -52,8 +53,11 @@ namespace GoogleCloudSamples
             Command = "Dialogflow"
         };
 
+        // Dialogflow enforces no more than 60 requests per minute per project.
+        // Many agents may be running the test at the same time, so limit
+        // our requests to 10 per minute.
         static readonly ThrottleTokenPool s_throttleTokenPool =
-            new ThrottleTokenPool(20, TimeSpan.FromSeconds(61));
+            new ThrottleTokenPool(10, TimeSpan.FromSeconds(61));
 
         // Run command and return output.
         // Project ID argument is always set.
