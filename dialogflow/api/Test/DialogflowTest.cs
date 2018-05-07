@@ -52,7 +52,7 @@ namespace GoogleCloudSamples
             Command = "Dialogflow"
         };
 
-        static ThrottleTokenPool s_throttleTokenPool =
+        static readonly ThrottleTokenPool s_throttleTokenPool =
             new ThrottleTokenPool(20, TimeSpan.FromSeconds(61));
 
         // Run command and return output.
@@ -85,10 +85,10 @@ namespace GoogleCloudSamples
     /// <summary>
     /// Schedules throttling.
     /// </summary>
-    class ThrottleTokenPool 
+    class ThrottleTokenPool
     {
         private readonly TimeSpan _timeSpan;
-        private readonly BlockingCollection<ThrottleToken> _pool = 
+        private readonly BlockingCollection<ThrottleToken> _pool =
             new BlockingCollection<ThrottleToken>();
         public ThrottleTokenPool(int tokenCount, TimeSpan timeSpan)
         {
@@ -97,14 +97,14 @@ namespace GoogleCloudSamples
                 _pool.Add(new ThrottleToken(this));
             }
 
-            this._timeSpan = timeSpan;
+            _timeSpan = timeSpan;
         }
 
         public IDisposable Acquire() => _pool.Take();
 
         internal void Release(ThrottleToken token)
         {
-            Task.Run(async () => 
+            Task.Run(async () =>
             {
                 await Task.Delay(_timeSpan);
                 _pool.Add(token);
@@ -125,5 +125,5 @@ namespace GoogleCloudSamples
         {
             _pool.Release(this);
         }
-    }    
+    }
 }
