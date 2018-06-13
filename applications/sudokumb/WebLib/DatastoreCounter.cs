@@ -14,7 +14,6 @@
 
 using Google.Api.Gax.Grpc;
 using Google.Cloud.Datastore.V1;
-using Google.Cloud.Diagnostics.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -42,7 +41,6 @@ namespace Sudokumb
         private readonly DatastoreDb _datastore;
         private readonly IOptions<DatastoreCounterOptions> _options;
         private readonly ILogger<DatastoreCounter> _logger;
-        private readonly IManagedTracer _tracer;
         private readonly object _thisLock = new object();
         private DatastoreCounter _counter;
         private DatastoreCounter _oldCounter;
@@ -51,13 +49,12 @@ namespace Sudokumb
 
         public DatastoreCounterSingleton(DatastoreDb datastore,
             IOptions<DatastoreCounterOptions> options,
-            ILogger<DatastoreCounter> logger, IManagedTracer tracer)
+            ILogger<DatastoreCounter> logger)
         {
             _datastore = datastore;
             _options = options;
             _logger = logger;
-            _tracer = tracer;
-            _counter = new DatastoreCounter(datastore, options, logger, tracer);
+            _counter = new DatastoreCounter(datastore, options, logger);
             _counterBirthday = DateTime.UtcNow;
         }
 
@@ -79,7 +76,7 @@ namespace Sudokumb
                         _counterBirthday = now;
                         _oldCounter = _counter;
                         _counter = new DatastoreCounter(
-                            _datastore, _options, _logger, _tracer);
+                            _datastore, _options, _logger);
                         _counter.StartAsync(CancellationToken.None);
                     }
                     return _counter;
@@ -118,20 +115,16 @@ namespace Sudokumb
         private CancellationTokenSource _cancelHostedService;
         private Task _hostedService;
         private readonly ILogger _logger;
-        private readonly IManagedTracer _tracer;
-
         private readonly ConcurrentDictionary<string, ICounter> _localCounters
                      = new ConcurrentDictionary<string, ICounter>();
 
         internal DatastoreCounter(DatastoreDb datastore,
             IOptions<DatastoreCounterOptions> options,
-            ILogger<DatastoreCounter> logger,
-            IManagedTracer tracer)
+            ILogger<DatastoreCounter> logger)
         {
             _datastore = datastore;
             _options = options;
             _logger = logger;
-            _tracer = tracer;
             var opts = options.Value;
             _keyFactory = new KeyFactory(datastore.ProjectId,
                 datastore.NamespaceId, opts.Kind);
@@ -140,8 +133,6 @@ namespace Sudokumb
         public async Task<long> GetCountAsync(string key,
             CancellationToken cancellationToken)
         {
-            using (_tracer.StartSpan(nameof(GetCountAsync)))
-            {
                 var callSettings = CallSettings.FromCancellationToken(
                     cancellationToken);
                 var query = new Query(_options.Value.Kind)
@@ -162,7 +153,6 @@ namespace Sudokumb
                     count += (long)entity[COUNT];
                 }
                 return count;
-            }
         }
 
         private string GetCounterId(string keyName)
