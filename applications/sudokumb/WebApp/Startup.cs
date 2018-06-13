@@ -85,6 +85,9 @@ namespace WebApp
         public void Configure(IApplicationBuilder app, IHostingEnvironment env,
             ILoggerFactory loggerFactory)
         {
+            // Configure logging service.
+            loggerFactory.AddGoogle(Configuration["Google:ProjectId"]);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
