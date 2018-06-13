@@ -66,8 +66,12 @@ namespace WebApp
                 Configuration["Google:NamespaceId"] ?? ""));
             services.Configure<KmsDataProtectionProviderOptions>(
                 Configuration.GetSection("Google"));
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddDefaultTokenProviders();
+            services.AddIdentity<ApplicationUser, IdentityRole>(options => {
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+            }).AddDefaultTokenProviders();
             services.AddTransient<IUserStore<ApplicationUser>,
                 DatastoreUserStore<ApplicationUser>>();
             services.AddTransient<IUserRoleStore<ApplicationUser>,
