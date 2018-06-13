@@ -13,6 +13,7 @@
 // the License.
 
 using Google.Cloud.Datastore.V1;
+using Google.Cloud.Diagnostics.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
@@ -41,6 +42,13 @@ namespace WebApp
         {
             services.AddOptions();
 
+            // Add exception logging.
+            services.AddGoogleExceptionLogging(options =>
+            {
+                options.ProjectId = Configuration["Google:ProjectId"];
+                options.ServiceName = Configuration["Google:AppEngine:ServiceName"] ?? "WebApp";
+                options.Version = Configuration["Google:AppEngine:Version"] ?? "0.0";
+            });
             services.Configure<Models.AccountViewModels.AccountOptions>(
                 Configuration.GetSection("Account"));
             services.Configure<PubsubGameBoardQueueOptions>(
@@ -85,6 +93,8 @@ namespace WebApp
             else
             {
                 app.UseExceptionHandler("/Home/Error");
+                // Configure error reporting service.
+                app.UseGoogleExceptionLogging();
             }
 
             app.UseStaticFiles();
