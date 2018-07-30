@@ -16,9 +16,14 @@ namespace GoogleCloudSamples
         }
 
         [Fact]
-        public void Test1()
+        public void TestList()
         {
-
+            var output = _fixture.Cmd.Run("list", "-p", _fixture.ProjectId);
+            // Confirm it contains the two configs we just created.
+            foreach (string configName in _fixture.UptimeCheckConfigNames)
+            {
+                Assert.Contains(configName, output.Stdout);
+            }
         }
     }
 
