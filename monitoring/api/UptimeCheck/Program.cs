@@ -58,6 +58,9 @@ namespace GoogleCloudSamples
     class ListOptions : OptionsWithProjectId
     {
     }
+
+    [Verb("list-ips", HelpText = "List IP addresses of uptime-check servers.")]
+    class ListIpsOptions {}
     
     public class UptimeCheck
     {
@@ -119,6 +122,19 @@ namespace GoogleCloudSamples
         }
         // [END monitoring_uptime_check_list_configs]
 
+        // [START monitoring_uptime_check_list_ips]
+        public static object ListUptimeCheckIps()
+        {
+            var client = UptimeCheckServiceClient.Create();
+            var ips = client.ListUptimeCheckIps(new ListUptimeCheckIpsRequest());
+            foreach (UptimeCheckIp ip in ips)
+            {
+                Console.WriteLine("{0,20} {1}", ip.IpAddress, ip.Location);
+            }
+            return 0;
+        }
+        // [END monitoring_uptime_check_list_ips]
+
         public static void Main(string[] args)
         { 
             var verbMap = new VerbMap<int>();
@@ -127,6 +143,7 @@ namespace GoogleCloudSamples
                         opts.HostName, opts.DisplayName))
                 .Add((DeleteOptions opts) => DeleteUptimeCheckConfig(opts.ConfigName))
                 .Add((ListOptions opts) => ListUptimeCheckConfigs(opts.ProjectId))
+                .Add((ListIpsOptions opts) => ListUptimeCheckIps())
                 .NotParsedFunc = (err) => 255;
             verbMap.Run(args);
         }

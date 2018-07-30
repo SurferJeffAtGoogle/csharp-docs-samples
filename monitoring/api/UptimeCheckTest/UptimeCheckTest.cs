@@ -25,6 +25,13 @@ namespace GoogleCloudSamples
                 Assert.Contains(configName, output.Stdout);
             }
         }
+
+        [Fact]
+        public void TestListIps()
+        {
+            var output = _fixture.Cmd.Run("list-ips");
+            Assert.Contains("Oregon", output.Stdout);
+        }
     }
 
     public class UptimeCheckTestFixture : IDisposable
