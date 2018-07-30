@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlertSample", "AlertSample\AlertSample.csproj", "{1D7ADD09-9E72-4A9B-8D2F-FDB1280DACC1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlertTest", "AlertTest\AlertTest.csproj", "{ABAD0C23-7114-423E-A377-168C6587369C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UptimeCheck", "UptimeCheck\UptimeCheck.csproj", "{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -86,5 +88,17 @@ Global
 		{ABAD0C23-7114-423E-A377-168C6587369C}.Release|x64.Build.0 = Release|x64
 		{ABAD0C23-7114-423E-A377-168C6587369C}.Release|x86.ActiveCfg = Release|x86
 		{ABAD0C23-7114-423E-A377-168C6587369C}.Release|x86.Build.0 = Release|x86
+		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Debug|x64.Build.0 = Debug|Any CPU
+		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Debug|x86.Build.0 = Debug|Any CPU
+		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Release|x64.ActiveCfg = Release|Any CPU
+		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Release|x64.Build.0 = Release|Any CPU
+		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Release|x86.ActiveCfg = Release|Any CPU
+		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
