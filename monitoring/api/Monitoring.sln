@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UptimeCheckTest", "UptimeCh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandLineUtil", "..\..\commandlineutil\Lib\CommandLineUtil.csproj", "{29902CD1-88DC-4674-8D63-C416F9AE24DE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testutil", "..\..\testutil\testutil.csproj", "{3D8A6AF5-3630-4542-BE08-0480334B3B43}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -128,5 +130,17 @@ Global
 		{29902CD1-88DC-4674-8D63-C416F9AE24DE}.Release|x64.Build.0 = Release|Any CPU
 		{29902CD1-88DC-4674-8D63-C416F9AE24DE}.Release|x86.ActiveCfg = Release|Any CPU
 		{29902CD1-88DC-4674-8D63-C416F9AE24DE}.Release|x86.Build.0 = Release|Any CPU
+		{3D8A6AF5-3630-4542-BE08-0480334B3B43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D8A6AF5-3630-4542-BE08-0480334B3B43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D8A6AF5-3630-4542-BE08-0480334B3B43}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3D8A6AF5-3630-4542-BE08-0480334B3B43}.Debug|x64.Build.0 = Debug|Any CPU
+		{3D8A6AF5-3630-4542-BE08-0480334B3B43}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3D8A6AF5-3630-4542-BE08-0480334B3B43}.Debug|x86.Build.0 = Debug|Any CPU
+		{3D8A6AF5-3630-4542-BE08-0480334B3B43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D8A6AF5-3630-4542-BE08-0480334B3B43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D8A6AF5-3630-4542-BE08-0480334B3B43}.Release|x64.ActiveCfg = Release|Any CPU
+		{3D8A6AF5-3630-4542-BE08-0480334B3B43}.Release|x64.Build.0 = Release|Any CPU
+		{3D8A6AF5-3630-4542-BE08-0480334B3B43}.Release|x86.ActiveCfg = Release|Any CPU
+		{3D8A6AF5-3630-4542-BE08-0480334B3B43}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
