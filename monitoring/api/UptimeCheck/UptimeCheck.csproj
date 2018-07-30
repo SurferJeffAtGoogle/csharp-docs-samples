@@ -8,5 +8,8 @@
     <PackageReference Include="CommandLineParser" Version="2.1.1-beta" />
     <PackageReference Include="Google.Cloud.Monitoring.V3" Version="1.1.0-beta01" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\commandlineutil\Lib\CommandLineUtil.csproj" />
+  </ItemGroup>
 
 </Project>

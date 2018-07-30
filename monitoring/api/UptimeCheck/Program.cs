@@ -41,6 +41,15 @@ namespace GoogleCloudSamples
         public string DisplayName { get; set; } = "New uptime check";
     }
 
+    [Verb("delete", HelpText = "Delete an uptime check.")]
+    class DeleteOptions
+    {
+        [Value('0', HelpText = "The full name of the config to delete. " +
+            "Example: projects/my-project/uptimeCheckConfigs/my-config-name",
+            Required = true)]
+        public string ConfigName { get; set; }
+    }
+
 #if false
     [Verb("list", HelpText = "List metric descriptors for this project.")]
     class ListOptions : CreateAndListOptions { }
@@ -139,6 +148,7 @@ namespace GoogleCloudSamples
         public static object CreateUptimeCheck(string projectId, string hostName,
             string displayName)            
         {
+            // Define a new config.
             var config = new UptimeCheckConfig()
             {
                 DisplayName = displayName,
@@ -155,28 +165,27 @@ namespace GoogleCloudSamples
                 Timeout = TimeSpan.FromSeconds(10).ToDuration(),
                 Period = TimeSpan.FromMinutes(5).ToDuration()
             };
+            // Create a client.
             var client = UptimeCheckServiceClient.Create();
             string projectName = new ProjectName(projectId).ToString();
+            // Create the config.
             var newConfig = client.CreateUptimeCheckConfig(projectName, config);
             Console.WriteLine(newConfig.Name);
             return 0;
         }
         // [END monitoring_uptime_check_create]
 
-#if false
-        // [START monitoring_delete_metric]
-        public static object DeleteMetric(string projectId, string metricType)
+        // [START monitoring_uptime_check_delete]
+        public static object DeleteUptimeCheckConfig(string configName)
         {
-            // Create client.
-            MetricServiceClient metricServiceClient = MetricServiceClient.Create();
-            // Initialize request argument(s).
-            MetricDescriptorName name = new MetricDescriptorName(projectId, metricType);
-            // Make the request.
-            metricServiceClient.DeleteMetricDescriptor(name);
-            Console.WriteLine($"Done deleting metric descriptor: {name}");
+            var client = UptimeCheckServiceClient.Create();
+            client.DeleteUptimeCheckConfig(configName);
+            Console.WriteLine($"Deleted {configName}");
             return 0;
         }
-        // [END monitoring_delete_metric]
+        // [END monitoring_uptime_check_delete]
+
+# if false
 
         // [START monitoring_list_descriptors]
         public static object ListMetrics(string projectId)
@@ -489,12 +498,14 @@ namespace GoogleCloudSamples
         }
 #endif
         public static void Main(string[] args)
-        {
-            Parser.Default.ParseArguments<CreateOptions>(args)
-              .MapResult(
-                (CreateOptions opts) => CreateUptimeCheck(opts.ProjectId, 
-                    opts.HostName, opts.DisplayName),
-                errs => 1);
+        { 
+            var verbMap = new VerbMap<int>();
+            verbMap
+                .Add((CreateOptions opts) => CreateUptimeCheck(opts.ProjectId, 
+                        opts.HostName, opts.DisplayName))
+                .Add((DeleteOptions opts) => DeleteUptimeCheckConfig(opts.ConfigName))
+                .NotParsedFunc = (err) => 255;
+            verbMap.Run(args);
         }
     }
 }
