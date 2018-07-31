@@ -37,7 +37,7 @@ namespace GoogleCloudSamples
     }
 
     [Verb("create", HelpText = "Create an uptime check.")]
-    class CreateOptions :OptionsWithProjectId
+    class CreateOptions : OptionsWithProjectId
     {
         [Option('h', HelpText = "Host name.")]
         public string HostName { get; set; } = "example.com";
@@ -47,7 +47,7 @@ namespace GoogleCloudSamples
 
     [Verb("update", HelpText = "Update an uptime check.")]
     class UpdateOptions : OptionsWithConfigName
-    {        
+    {
         [Option('h', HelpText = "The new http path to check.")]
         public string HttpPath { get; set; }
 
@@ -77,7 +77,7 @@ namespace GoogleCloudSamples
     class ListIpsOptions
     {
     }
-    
+
     [Verb("get", HelpText = "Get details for an uptime check.")]
     class GetOptions : OptionsWithConfigName
     {
@@ -89,7 +89,7 @@ namespace GoogleCloudSamples
 
         // [START monitoring_uptime_check_create]
         public static object CreateUptimeCheck(string projectId, string hostName,
-            string displayName)            
+            string displayName)
         {
             // Define a new config.
             var config = new UptimeCheckConfig()
@@ -98,7 +98,7 @@ namespace GoogleCloudSamples
                 MonitoredResource = new MonitoredResource()
                 {
                     Type = "uptime_url",
-                    Labels = {{"host", hostName}}
+                    Labels = { { "host", hostName } }
                 },
                 HttpCheck = new UptimeCheckConfig.Types.HttpCheck()
                 {
@@ -173,7 +173,7 @@ namespace GoogleCloudSamples
                 config.HttpCheck.Path = newHttpPath;
                 fieldMask.Paths.Add("http_check.path");
             }
-            client.UpdateUptimeCheckConfig(config);            
+            client.UpdateUptimeCheckConfig(config);
             return 0;
         }
         // [END monitoring_uptime_check_update]
@@ -197,7 +197,7 @@ namespace GoogleCloudSamples
         // [END monitoring_uptime_check_get]
 
         public static int Main(string[] args)
-        { 
+        {
             var verbMap = new VerbMap<int>();
             verbMap
                 .Add((CreateOptions opts) => CreateUptimeCheck(opts.ProjectId,
