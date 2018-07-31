@@ -45,13 +45,27 @@ namespace GoogleCloudSamples
         public string DisplayName { get; set; } = "New uptime check";
     }
 
-    [Verb("delete", HelpText = "Delete an uptime check.")]
-    class DeleteOptions
+    [Verb("update", HelpText = "Update an uptime check.")]
+    class UpdateOptions : OptionsWithConfigName
+    {        
+        [Option('h', HelpText = "The new http path to check.")]
+        public string HttpPath { get; set; }
+
+        [Option('d', HelpText = "The new display name.")]
+        public string DisplayName { get; set; }
+    }
+
+    class OptionsWithConfigName
     {
         [Value('0', HelpText = "The full name of the config to delete. " +
             "Example: projects/my-project/uptimeCheckConfigs/my-config-name",
             Required = true)]
         public string ConfigName { get; set; }
+    }
+
+    [Verb("delete", HelpText = "Delete an uptime check.")]
+    class DeleteOptions : OptionsWithConfigName
+    {
     }
 
     [Verb("list", HelpText = "List metric descriptors for this project.")]
@@ -60,8 +74,15 @@ namespace GoogleCloudSamples
     }
 
     [Verb("list-ips", HelpText = "List IP addresses of uptime-check servers.")]
-    class ListIpsOptions {}
+    class ListIpsOptions
+    {
+    }
     
+    [Verb("get", HelpText = "Get details for an uptime check.")]
+    class GetOptions : OptionsWithConfigName
+    {
+    }
+
     public class UptimeCheck
     {
         private static readonly DateTime s_unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -135,7 +156,47 @@ namespace GoogleCloudSamples
         }
         // [END monitoring_uptime_check_list_ips]
 
-        public static void Main(string[] args)
+        // [START monitoring_uptime_check_update]
+        public static object UpdateUptimeCheck(string configName,
+            string newHttpPath, string newDisplayName)
+        {
+            var client = UptimeCheckServiceClient.Create();
+            var config = client.GetUptimeCheckConfig(configName);
+            var fieldMask = new FieldMask();
+            if (newDisplayName != null)
+            {
+                config.DisplayName = newDisplayName;
+                fieldMask.Paths.Add("display_name");
+            }
+            if (newHttpPath != null)
+            {
+                config.HttpCheck.Path = newHttpPath;
+                fieldMask.Paths.Add("http_check.path");
+            }
+            client.UpdateUptimeCheckConfig(config);            
+            return 0;
+        }
+        // [END monitoring_uptime_check_update]
+
+        // [START monitoring_uptime_check_get]
+        public static object GetUptimeCheckConfig(string configName)
+        {
+            var client = UptimeCheckServiceClient.Create();
+            UptimeCheckConfig config = client.GetUptimeCheckConfig(configName);
+            if (config == null)
+            {
+                Console.Error.WriteLine(
+                    "No configuration found with the name {0}", configName);
+                return -1;
+            }
+            Console.WriteLine("Name: {0}", config.Name);
+            Console.WriteLine("Display Name: {0}", config.DisplayName);
+            Console.WriteLine("Http Path: {0}", config.HttpCheck.Path);
+            return 0;
+        }
+        // [END monitoring_uptime_check_get]
+
+        public static int Main(string[] args)
         { 
             var verbMap = new VerbMap<int>();
             verbMap
@@ -144,8 +205,10 @@ namespace GoogleCloudSamples
                 .Add((DeleteOptions opts) => DeleteUptimeCheckConfig(opts.ConfigName))
                 .Add((ListOptions opts) => ListUptimeCheckConfigs(opts.ProjectId))
                 .Add((ListIpsOptions opts) => ListUptimeCheckIps())
+                .Add((GetOptions opts) => GetUptimeCheckConfig(opts.ConfigName))
+                .Add((UpdateOptions opts) => UpdateUptimeCheck(opts.ConfigName, opts.HttpPath, opts.DisplayName))
                 .NotParsedFunc = (err) => 255;
-            verbMap.Run(args);
+            return verbMap.Run(args);
         }
     }
 }

@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace GoogleCloudSamples
 {
-
-
     public class UptimeCheckTest : IClassFixture<UptimeCheckTestFixture>
     {
         private readonly UptimeCheckTestFixture _fixture;
@@ -32,6 +31,16 @@ namespace GoogleCloudSamples
             var output = _fixture.Cmd.Run("list-ips");
             Assert.Contains("Oregon", output.Stdout);
         }
+ 
+        [Fact]
+        public void TestUpdateAndGet()
+        {
+            _fixture.Cmd.Run("update", _fixture.UptimeCheckConfigNames.First(), "-d", "whippletree");
+            _fixture.Cmd.Run("update", _fixture.UptimeCheckConfigNames.First(), "-h", "http://tachistoscope.com");
+            var output = _fixture.Cmd.Run("get", _fixture.UptimeCheckConfigNames.First());
+            Assert.Contains("whippletree", output.Stdout);
+            Assert.Contains("tachistoscope.com", output.Stdout);
+        } 
     }
 
     public class UptimeCheckTestFixture : IDisposable
@@ -50,7 +59,7 @@ namespace GoogleCloudSamples
 
         public CommandLineRunner Cmd {get; private set;} = new CommandLineRunner()
         {
-            VoidMain = UptimeCheck.Main,
+            Main = UptimeCheck.Main,
             Command = "UptimeCheck"
         };
 
