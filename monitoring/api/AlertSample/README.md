@@ -18,7 +18,7 @@ can use [this older sample](
     [Click here](https://console.cloud.google.com/flows/enableapi?apiid=monitoring.googleapis.com&showconfirmation=true)
     to visit Cloud Platform Console and enable the Google Stackdriver Monitoring API.
 
-7. Edit [QuickStart.cs](QuickStart/QuickStart.cs), and replace YOUR-PROJECT-ID with the id of the project you created in step 1.
+7.  Edit [QuickStart.cs](QuickStart/QuickStart.cs), and replace YOUR-PROJECT-ID with the id of the project you created in step 1.
 
 9.  From a Powershell command line, run the QuickStart sample:
     ```
