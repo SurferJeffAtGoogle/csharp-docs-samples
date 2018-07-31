@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
@@ -13,13 +13,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlertSample", "AlertSample\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlertTest", "AlertTest\AlertTest.csproj", "{ABAD0C23-7114-423E-A377-168C6587369C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UptimeCheck", "UptimeCheck\UptimeCheck.csproj", "{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UptimeCheckTest", "UptimeCheckTest\UptimeCheckTest.csproj", "{965B16A5-1878-4DB3-A6CE-1D50727195AD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandLineUtil", "..\..\commandlineutil\Lib\CommandLineUtil.csproj", "{29902CD1-88DC-4674-8D63-C416F9AE24DE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testutil", "..\..\testutil\testutil.csproj", "{3D8A6AF5-3630-4542-BE08-0480334B3B43}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UptimeCheck", "UptimeCheckSample\UptimeCheck.csproj", "{B6E1D7DE-7142-4C72-8378-27DE00B2CBFF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -94,18 +94,6 @@ Global
 		{ABAD0C23-7114-423E-A377-168C6587369C}.Release|x64.Build.0 = Release|x64
 		{ABAD0C23-7114-423E-A377-168C6587369C}.Release|x86.ActiveCfg = Release|x86
 		{ABAD0C23-7114-423E-A377-168C6587369C}.Release|x86.Build.0 = Release|x86
-		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Debug|x64.Build.0 = Debug|Any CPU
-		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Debug|x86.Build.0 = Debug|Any CPU
-		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Release|x64.ActiveCfg = Release|Any CPU
-		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Release|x64.Build.0 = Release|Any CPU
-		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Release|x86.ActiveCfg = Release|Any CPU
-		{BDDCAA98-87F7-4E2B-886C-A9C7D5A1C86E}.Release|x86.Build.0 = Release|Any CPU
 		{965B16A5-1878-4DB3-A6CE-1D50727195AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{965B16A5-1878-4DB3-A6CE-1D50727195AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{965B16A5-1878-4DB3-A6CE-1D50727195AD}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -142,5 +130,17 @@ Global
 		{3D8A6AF5-3630-4542-BE08-0480334B3B43}.Release|x64.Build.0 = Release|Any CPU
 		{3D8A6AF5-3630-4542-BE08-0480334B3B43}.Release|x86.ActiveCfg = Release|Any CPU
 		{3D8A6AF5-3630-4542-BE08-0480334B3B43}.Release|x86.Build.0 = Release|Any CPU
+		{B6E1D7DE-7142-4C72-8378-27DE00B2CBFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6E1D7DE-7142-4C72-8378-27DE00B2CBFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6E1D7DE-7142-4C72-8378-27DE00B2CBFF}.Debug|x64.ActiveCfg = Debug|x64
+		{B6E1D7DE-7142-4C72-8378-27DE00B2CBFF}.Debug|x64.Build.0 = Debug|x64
+		{B6E1D7DE-7142-4C72-8378-27DE00B2CBFF}.Debug|x86.ActiveCfg = Debug|x86
+		{B6E1D7DE-7142-4C72-8378-27DE00B2CBFF}.Debug|x86.Build.0 = Debug|x86
+		{B6E1D7DE-7142-4C72-8378-27DE00B2CBFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6E1D7DE-7142-4C72-8378-27DE00B2CBFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6E1D7DE-7142-4C72-8378-27DE00B2CBFF}.Release|x64.ActiveCfg = Release|x64
+		{B6E1D7DE-7142-4C72-8378-27DE00B2CBFF}.Release|x64.Build.0 = Release|x64
+		{B6E1D7DE-7142-4C72-8378-27DE00B2CBFF}.Release|x86.ActiveCfg = Release|x86
+		{B6E1D7DE-7142-4C72-8378-27DE00B2CBFF}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 EndGlobal
