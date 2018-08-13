@@ -43,6 +43,10 @@ namespace GoogleCloudSamples
         public string HostName { get; set; } = "example.com";
         [Option('d', HelpText = "Display name.")]
         public string DisplayName { get; set; } = "New uptime check";
+
+        [Option('i', HelpText = "Id.  If not specified, will be supplied",
+        Required=false)]
+        public string Id { get; set; }
     }
 
     [Verb("update", HelpText = "Update an uptime check.")]
@@ -87,7 +91,7 @@ namespace GoogleCloudSamples
     {
         // [START monitoring_uptime_check_create]
         public static object CreateUptimeCheck(string projectId, string hostName,
-            string displayName)
+            string displayName, string id)
         {
             // Define a new config.
             var config = new UptimeCheckConfig()
@@ -104,7 +108,8 @@ namespace GoogleCloudSamples
                     Port = 80,
                 },
                 Timeout = TimeSpan.FromSeconds(10).ToDuration(),
-                Period = TimeSpan.FromMinutes(5).ToDuration()
+                Period = TimeSpan.FromMinutes(5).ToDuration(),
+                Name = id == null ? null : new UptimeCheckConfigName(projectId, id).ToString()
             };
             // Create a client.
             var client = UptimeCheckServiceClient.Create();
@@ -199,7 +204,7 @@ namespace GoogleCloudSamples
             var verbMap = new VerbMap<int>();
             verbMap
                 .Add((CreateOptions opts) => CreateUptimeCheck(opts.ProjectId,
-                        opts.HostName, opts.DisplayName))
+                        opts.HostName, opts.DisplayName, opts.Id))
                 .Add((DeleteOptions opts) => DeleteUptimeCheckConfig(opts.ConfigName))
                 .Add((ListOptions opts) => ListUptimeCheckConfigs(opts.ProjectId))
                 .Add((ListIpsOptions opts) => ListUptimeCheckIps())
