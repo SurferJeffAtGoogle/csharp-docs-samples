@@ -19,6 +19,10 @@ namespace SocialAuth
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((hostingContext, config) => {
+                    config.AddJsonFile(() => {
+                        
+                })
                 .UseStartup<Startup>();
     }
 }
