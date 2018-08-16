@@ -15,11 +15,21 @@ namespace SocialAuth.Services.Kms
         private readonly IFileProvider innerProvider;
 
         public EncryptedFileProvider(
-            Google.Cloud.Kms.V1.KeyManagementServiceClient kms,
-            IFileProvider innerProvider)
+            KeyManagementServiceClient kms = null,
+            IFileProvider innerProvider = null)
         {
-            this.kms = kms;
-            this.innerProvider = innerProvider;
+            this.kms = kms ?? KeyManagementServiceClient.Create();
+            if (innerProvider == null)
+            {
+                string fullPath = System.Reflection.Assembly
+                    .GetAssembly(typeof(EncryptedFileProvider)).Location;
+                string directory = Path.GetDirectoryName(fullPath);
+                this.innerProvider = new PhysicalFileProvider(directory);
+            }
+            else
+            {
+                this.innerProvider = innerProvider;
+            }
         }
 
         public IDirectoryContents GetDirectoryContents(string subpath)
