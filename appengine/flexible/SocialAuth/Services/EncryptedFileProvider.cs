@@ -34,7 +34,25 @@ namespace SocialAuth.Services.Kms
 
         public IFileInfo GetFileInfo(string subpath)
         {
-            var fileInfo = innerProvider.GetFileInfo(subpath);
+            return EncryptedFileInfo.FromFileInfo(kms,
+                innerProvider.GetFileInfo(subpath),
+                innerProvider.GetFileInfo(Path.ChangeExtension(subpath, ".keyname")));
+        }
+
+        public IChangeToken Watch(string filter)
+        {
+            return innerProvider.Watch(filter + ".encrypted");
+        }
+    }
+
+    public class EncryptedFileInfo : IFileInfo
+    {
+        private readonly KeyManagementServiceClient kms;
+        private readonly CryptoKeyName cryptoKeyName;
+        private readonly IFileInfo innerFileInfo;
+        public static IFileInfo FromFileInfo(KeyManagementServiceClient kms,
+            IFileInfo fileInfo, IFileInfo keynameFileInfo)
+        {
             if (fileInfo == null)
             {
                 return null;
@@ -47,34 +65,45 @@ namespace SocialAuth.Services.Kms
             {
                 return null;
             }
-            string keyNamePath = Path.ChangeExtension(subpath, ".keyname");
-            var keyNameInfo = innerProvider.GetFileInfo(keyNamePath);
-            if (keyNameInfo == null || !keyNameInfo.Exists || keyNameInfo.IsDirectory)
+            if (keynameFileInfo == null || !keynameFileInfo.Exists || keynameFileInfo.IsDirectory)
             {
                 throw new FileNotFoundException("Encrypted file found, but "
                     + "failed to find corresponding keyname file.",
-                    keyNamePath);
+                    keynameFileInfo.Name);
             }
-            return new EncryptedFileInfo(kms, fileInfo, keyNameInfo);
+
+            using (var reader = new StreamReader(keynameFileInfo.CreateReadStream()))
+            {
+                string line = "";
+                while (!reader.EndOfStream) 
+                {
+                    line = reader.ReadLine().Trim();
+                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith('#')) 
+                    {
+                        continue; // blank or comment;
+                    }
+                    string[] segments = line.Split('/');
+                    if (segments.Length == 4) 
+                    {
+                        return new EncryptedFileInfo(kms, 
+                            new CryptoKeyName(segments[0], segments[1], 
+                            segments[2], segments[3]),
+                            fileInfo);
+                    }
+                    break;
+                }
+                throw new Exception(
+                    $"Incorrectly formatted keyname file {keynameFileInfo.Name}.\n" +
+                    "Expected projectId/locationId/keyringId/keyId\n" +
+                    $"Instead, found {line}.");                        
+            }
         }
 
-        public IChangeToken Watch(string filter)
-        {
-            return innerProvider.Watch(filter);
-        }
-    }
-
-    public class EncryptedFileInfo : IFileInfo
-    {
-        private readonly KeyManagementServiceClient kms;
-        private readonly CryptoKeyName kryptoKeyName;
-        private readonly IFileInfo innerFileInfo;
-
-        public EncryptedFileInfo(KeyManagementServiceClient kms,
+        private EncryptedFileInfo(KeyManagementServiceClient kms,
             CryptoKeyName kryptoKeyName, IFileInfo innerFileInfo)
         {
             this.kms = kms;
-            this.kryptoKeyName = kryptoKeyName;
+            this.cryptoKeyName = kryptoKeyName;
             this.innerFileInfo = innerFileInfo;
         }
 
@@ -100,7 +129,7 @@ namespace SocialAuth.Services.Kms
             DecryptResponse response;
             using (var stream = innerFileInfo.CreateReadStream())
             {
-                response = kms.Decrypt(kryptoKeyName,
+                response = kms.Decrypt(cryptoKeyName,
                     ByteString.FromStream(stream));
             }
             MemoryStream memStream = new MemoryStream();
