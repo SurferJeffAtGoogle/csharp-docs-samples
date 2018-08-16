@@ -138,11 +138,10 @@ namespace SocialAuth.Services.Kms
                     {
                         continue; // blank or comment;
                     }
-                    string[] segments = line.Split('/');
-                    if (segments.Length == 8) 
+                    var keyName = CryptoKeyName.Parse(line);
+                    if (keyName != null)
                     {
-                        return new CryptoKeyName(segments[1], segments[3], 
-                            segments[5], segments[7]);
+                        return keyName;
                     }
                     break;
                 }
