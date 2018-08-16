@@ -48,7 +48,8 @@ namespace SocialAuth.Services.Kms
     public class EncryptedFileInfo : IFileInfo
     {
         private readonly KeyManagementServiceClient kms;
-        private readonly CryptoKeyName cryptoKeyName;
+        private readonly IFileInfo keynameFileInfo;
+        private readonly Lazy<CryptoKeyName> cryptoKeyName; 
         private readonly IFileInfo innerFileInfo;
         public static IFileInfo FromFileInfo(KeyManagementServiceClient kms,
             IFileInfo fileInfo, IFileInfo keynameFileInfo)
@@ -65,46 +66,16 @@ namespace SocialAuth.Services.Kms
             {
                 return null;
             }
-            if (keynameFileInfo == null || !keynameFileInfo.Exists || keynameFileInfo.IsDirectory)
-            {
-                throw new FileNotFoundException("Encrypted file found, but "
-                    + "failed to find corresponding keyname file.",
-                    keynameFileInfo.Name);
-            }
-
-            using (var reader = new StreamReader(keynameFileInfo.CreateReadStream()))
-            {
-                string line = "";
-                while (!reader.EndOfStream) 
-                {
-                    line = reader.ReadLine().Trim();
-                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith('#')) 
-                    {
-                        continue; // blank or comment;
-                    }
-                    string[] segments = line.Split('/');
-                    if (segments.Length == 4) 
-                    {
-                        return new EncryptedFileInfo(kms, 
-                            new CryptoKeyName(segments[0], segments[1], 
-                            segments[2], segments[3]),
-                            fileInfo);
-                    }
-                    break;
-                }
-                throw new Exception(
-                    $"Incorrectly formatted keyname file {keynameFileInfo.Name}.\n" +
-                    "Expected projectId/locationId/keyringId/keyId\n" +
-                    $"Instead, found {line}.");                        
-            }
+            return new EncryptedFileInfo(kms, fileInfo, keynameFileInfo);
         }
 
         private EncryptedFileInfo(KeyManagementServiceClient kms,
-            CryptoKeyName kryptoKeyName, IFileInfo innerFileInfo)
+            IFileInfo innerFileInfo, IFileInfo keynameFileInfo)
         {
             this.kms = kms;
-            this.cryptoKeyName = kryptoKeyName;
+            this.keynameFileInfo = keynameFileInfo;
             this.innerFileInfo = innerFileInfo;
+            this.cryptoKeyName = new Lazy<CryptoKeyName>(() => UnpackKeyName(keynameFileInfo));
         }
 
         public bool Exists => innerFileInfo.Exists && innerFileInfo.Name.EndsWith(".encrypted");
@@ -129,7 +100,7 @@ namespace SocialAuth.Services.Kms
             DecryptResponse response;
             using (var stream = innerFileInfo.CreateReadStream())
             {
-                response = kms.Decrypt(cryptoKeyName,
+                response = kms.Decrypt(cryptoKeyName.Value,
                     ByteString.FromStream(stream));
             }
             MemoryStream memStream = new MemoryStream();
@@ -137,30 +108,88 @@ namespace SocialAuth.Services.Kms
             memStream.Seek(0, SeekOrigin.Begin);
             return memStream;
         }
+
+        private static CryptoKeyName UnpackKeyName(IFileInfo keynameFileInfo)
+        {
+            if (keynameFileInfo == null || !keynameFileInfo.Exists || keynameFileInfo.IsDirectory)
+            {
+                throw new FileNotFoundException("Encrypted file found, but "
+                    + "failed to find corresponding keyname file.",
+                    keynameFileInfo.Name);
+            }
+
+            using (var reader = new StreamReader(keynameFileInfo.CreateReadStream()))
+            {
+                string line = "";
+                while (!reader.EndOfStream) 
+                {
+                    line = reader.ReadLine().Trim();
+                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith('#')) 
+                    {
+                        continue; // blank or comment;
+                    }
+                    string[] segments = line.Split('/');
+                    if (segments.Length == 4) 
+                    {
+                        return new CryptoKeyName(segments[0], segments[1], 
+                            segments[2], segments[3]);
+                    }
+                    break;
+                }
+                throw new Exception(
+                    $"Incorrectly formatted keyname file {keynameFileInfo.Name}.\n" +
+                    "Expected projectId/locationId/keyringId/keyId\n" +
+                    $"Instead, found {line}.");                        
+            }
+        }
     }
 
     public class EncryptedDirectoryContents : IDirectoryContents
     {
         private readonly KeyManagementServiceClient kms;
-        private readonly CryptoKeyName cryptoKeyName;
         private readonly IDirectoryContents innerDirectoryContents;
-        public EncryptedDirectoryContents(Google.Cloud.Kms.V1.KeyManagementServiceClient kms,
-            CryptoKeyName cryptoKeyName, IDirectoryContents innerDirectoryContents)
+        public EncryptedDirectoryContents(KeyManagementServiceClient kms,
+            IDirectoryContents innerDirectoryContents)
         {
             this.kms = kms;
             this.innerDirectoryContents = innerDirectoryContents;
-            this.cryptoKeyName = cryptoKeyName;
         }
 
         public bool Exists => innerDirectoryContents.Exists;
 
         public IEnumerator<IFileInfo> GetEnumerator()
         {
+            // Only enumerate directories, and files with matching
+            // .encrypted and .keyname extensions.
+            var keynameFiles = new Dictionary<String, IFileInfo>();
+            var encryptedFiles = new List<IFileInfo>();
             foreach (var fileInfo in innerDirectoryContents)
             {
-                if (fileInfo.IsDirectory || fileInfo.Name.EndsWith(".encrypted"))
+                if (fileInfo.IsDirectory)
                 {
-                    yield return new EncryptedFileInfo(kms, cryptoKeyName, fileInfo);
+                    yield return fileInfo;
+                }
+                else
+                {
+                    string extension = Path.GetExtension(fileInfo.Name);
+                    if (extension == ".encrypted")
+                    {
+                        encryptedFiles.Add(fileInfo);
+                    }
+                    else if (extension == ".keyname")
+                    {
+                        keynameFiles[fileInfo.Name] = fileInfo;
+                    }
+                }
+            }
+            foreach (IFileInfo fileInfo in encryptedFiles) 
+            {
+                IFileInfo keynameFile = keynameFiles.GetValueOrDefault(
+                    Path.ChangeExtension(fileInfo.Name, ".keyname"));
+                if (keynameFile != null)
+                {
+                    yield return EncryptedFileInfo.FromFileInfo(kms, fileInfo,
+                        keynameFile);
                 } 
             }
         }
