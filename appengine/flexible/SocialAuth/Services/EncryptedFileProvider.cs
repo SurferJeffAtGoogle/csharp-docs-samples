@@ -139,16 +139,16 @@ namespace SocialAuth.Services.Kms
                         continue; // blank or comment;
                     }
                     string[] segments = line.Split('/');
-                    if (segments.Length == 4) 
+                    if (segments.Length == 8) 
                     {
-                        return new CryptoKeyName(segments[0], segments[1], 
-                            segments[2], segments[3]);
+                        return new CryptoKeyName(segments[1], segments[3], 
+                            segments[5], segments[7]);
                     }
                     break;
                 }
                 throw new Exception(
                     $"Incorrectly formatted keyname file {keynameFileInfo.Name}.\n" +
-                    "Expected projectId/locationId/keyringId/keyId\n" +
+                    "Expected projects/<projectId>/locations/<locationId>/keyRings/<keyringId>/cryptoKeys/<keyId>\n" +
                     $"Instead, found {line}.");                        
             }
         }
