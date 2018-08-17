@@ -9,4 +9,9 @@
     <PackageReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsecrets.json.encrypted" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="appsecrets.json.keyname" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
