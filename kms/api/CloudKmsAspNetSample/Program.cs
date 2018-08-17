@@ -19,6 +19,11 @@ namespace CloudKmsAspNetSample
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((hostingContext, config) => {
+                    config.AddJsonFile(
+                        new Services.Kms.EncryptedFileProvider(), "appsecrets.json.encrypted",
+                        optional: true, reloadOnChange: false);                        
+                })
                 .UseStartup<Startup>();
     }
 }
