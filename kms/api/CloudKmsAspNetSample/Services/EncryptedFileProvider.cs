@@ -51,7 +51,7 @@ namespace CloudKmsAspNetSample.Services.Kms
 
         public IChangeToken Watch(string filter)
         {
-            return innerProvider.Watch(filter + ".encrypted");
+            return innerProvider.Watch(filter);
         }
     }
 
