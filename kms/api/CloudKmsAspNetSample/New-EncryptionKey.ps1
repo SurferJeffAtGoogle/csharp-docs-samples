@@ -27,12 +27,12 @@ $matchingKeyRing = foreach ($globalKeyRing in $globalKeyRings) {
 }
 if (-not $matchingKeyRing) {
     # Create the new key ring.
-    "Creating new key ring $keyRingId..." | Write-Information
+    Write-Information "Creating new key ring $keyRingId..." 
     gcloud kms keyrings create $keyRingId --location global
 }
 
 # Create the new key.
-"Creating new key $keyId..." | Write-Information
+Write-Information "Creating new key $keyId..."
 gcloud kms keys create $keyId --location global --keyring $keyRingId --purpose=encryption
 # Write the new key name to appsecrets.json.keyname.
 $keyName = (gcloud kms keys list --location global --keyring $keyRingId --format json | ConvertFrom-Json).name | Where-Object {$_ -like "*/$keyId" }
