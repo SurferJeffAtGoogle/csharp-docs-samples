@@ -49,4 +49,10 @@ public class TranslateTest
         Assert.Equal("EN", detection.Language.ToUpper());
     }
 
+    [Fact]
+    public void TestTranslateTextWithModel()
+    {
+        TranslationResult result = sample.TranslateTextWithModel();
+        Assert.False(string.IsNullOrWhiteSpace(result.TranslatedText));
+    }
 }
