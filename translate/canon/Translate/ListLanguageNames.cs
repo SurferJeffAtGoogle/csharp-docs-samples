@@ -12,21 +12,23 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 //
-// [START translate_translate_text]
+// [START translate_list_language_names]
 using Google.Cloud.Translation.V2;
 using System;
+using System.Collections.Generic;
 
 public partial class TranslateSample
 {
-    public string TranslateText()
+    public IList<Language> ListLanguageNames()
     {
         TranslationClient client = TranslationClient.Create();
-        var response = client.TranslateText(
-            "Hello World.",  // The text to translate.
-            "ru",  // The target language code.  Russian.
-            "en");  // The source language code.  English.
-        Console.WriteLine(response.TranslatedText);
-        return response.TranslatedText;
+        IList<Language> languages = client.ListLanguages(
+            "en");  // The language to use to list the language names.
+        foreach (var language in languages)
+        {
+            Console.WriteLine("{0}\t{1}", language.Code, language.Name);
+        }
+        return languages;
     }
 }
-// [END translate_translate_text]
+// [END translate_list_language_names]

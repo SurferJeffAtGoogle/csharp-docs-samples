@@ -17,8 +17,14 @@ public class TranslateTest
     [Fact]
     public void TestListLanguageCodes()
     {
-        IList<Language> codes = sample.ListLanguageCodes();
-        Assert.NotEmpty(codes);
+        IList<Language> languages = sample.ListLanguageCodes();
+        Assert.NotEmpty(languages);
     }
 
+    [Fact]
+    public void TestListLanguageNames()
+    {
+        IList<Language> languages = sample.ListLanguageNames();
+        Assert.NotEmpty(languages);
+    }
 }
