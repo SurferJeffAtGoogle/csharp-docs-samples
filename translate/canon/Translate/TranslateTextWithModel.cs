@@ -13,6 +13,7 @@
 // the License.
 //
 // [START translate_text_with_model]
+
 using Google.Cloud.Translation.V2;
 using System;
 
@@ -25,7 +26,7 @@ public partial class TranslateSample
             "Hello World.",  // The text to be translated.
             "ja",  // The target language code.
             "en",  // The source language code.
-            // Use the neural model of translation.
+                   // Use the neural model of translation.
             TranslationModel.NeuralMachineTranslation);
         Console.WriteLine("Model: {0}", result.Model);
         Console.WriteLine(result.TranslatedText);

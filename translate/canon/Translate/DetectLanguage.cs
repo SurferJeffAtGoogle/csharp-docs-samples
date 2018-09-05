@@ -13,6 +13,7 @@
 // the License.
 //
 // [START translate_detect_language]
+
 using Google.Cloud.Translation.V2;
 using System;
 

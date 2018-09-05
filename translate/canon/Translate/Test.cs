@@ -12,6 +12,7 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 //
+
 using System;
 using System.Collections.Generic;
 using Google.Cloud.Translation.V2;
@@ -19,40 +20,40 @@ using Xunit;
 
 public class TranslateTest
 {
-    TranslateSample sample = new TranslateSample();
+    readonly TranslateSample _sample = new TranslateSample();
 
     [Fact]
     public void TestTranslateText()
     {
-        string translatedText = sample.TranslateText();
+        string translatedText = _sample.TranslateText();
         Assert.False(string.IsNullOrWhiteSpace(translatedText));
     }
 
     [Fact]
     public void TestListLanguageCodes()
     {
-        IList<Language> languages = sample.ListLanguageCodes();
+        IList<Language> languages = _sample.ListLanguageCodes();
         Assert.NotEmpty(languages);
     }
 
     [Fact]
     public void TestListLanguageNames()
     {
-        IList<Language> languages = sample.ListLanguageNames();
+        IList<Language> languages = _sample.ListLanguageNames();
         Assert.NotEmpty(languages);
     }
 
     [Fact]
     public void TestDetectLanguage()
     {
-        Detection detection = sample.DetectLanguage();
+        Detection detection = _sample.DetectLanguage();
         Assert.Equal("EN", detection.Language.ToUpper());
     }
 
     [Fact]
     public void TestTranslateTextWithModel()
     {
-        TranslationResult result = sample.TranslateTextWithModel();
+        TranslationResult result = _sample.TranslateTextWithModel();
         Assert.False(string.IsNullOrWhiteSpace(result.TranslatedText));
     }
 }
