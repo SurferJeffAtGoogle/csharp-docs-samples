@@ -241,12 +241,12 @@ A collection of samples that demonstrate how to call the
 
 ## Contributing changes
 
-* See [CONTRIBUTING.md](../../../CONTRIBUTING.md)
+* See [CONTRIBUTING.md](../../CONTRIBUTING.md)
 
 ## Licensing
 
-* See [LICENSE](../../../LICENSE)
+* See [LICENSE](../../LICENSE)
 
 ## Testing
 
-* See [TESTING.md](../../../TESTING.md)
+* See [TESTING.md](../../TESTING.md)
