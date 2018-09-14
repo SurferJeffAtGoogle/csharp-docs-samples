@@ -18,10 +18,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using CloudKmsAspNetSample.Models;
+using SocialAuthMVC.Models;
 using Microsoft.Extensions.Options;
 
-namespace CloudKmsAspNetSample.Controllers
+namespace SocialAuthMVC.Controllers
 {
     public class HomeController : Controller
     {

@@ -46,7 +46,7 @@ This sample requires [.NET Core 2.0](
     info: Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager[0]
         User profile is available. Using '~/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
     Hosting environment: Development
-    Content root path: /.../kms/api/CloudKmsAspNetSample
+    Content root path: /.../kms/api/SocialAuthMVC
     Now listening on: https://localhost:5001
     Now listening on: http://localhost:5000
     Application started. Press Ctrl+C to shut down.

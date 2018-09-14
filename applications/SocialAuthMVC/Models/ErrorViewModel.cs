@@ -14,7 +14,7 @@
 
 using System;
 
-namespace CloudKmsAspNetSample.Models
+namespace SocialAuthMVC.Models
 {
     public class ErrorViewModel
     {

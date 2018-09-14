@@ -21,7 +21,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
-namespace CloudKmsAspNetSample.Services.Kms
+namespace SocialAuthMVC.Services.Kms
 {
     /// <summary>
     /// Decrypts encrypted files in memory, 
