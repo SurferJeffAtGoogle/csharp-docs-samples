@@ -22,7 +22,7 @@ This sample requires [.NET Core 2.0](
 5.  Create a new encryption key.
     ```
     PS > .\New-EncryptionKey.ps1
-    projects/<your-project-id>/locations/global/keyRings/webapp/cryptoKeys/appsecrets
+    projects/<your-project-id>/locations/global/keyRings/socialauth/cryptoKeys/appsecrets
     ```
 
 6.  Create a file called `appsecrets.json` and fill it with this json:

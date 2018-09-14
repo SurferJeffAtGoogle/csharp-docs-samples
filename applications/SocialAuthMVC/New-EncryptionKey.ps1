@@ -27,9 +27,9 @@
 #
 #.EXAMPLE
 # .\New-EncryptionKey.ps1
-# projects/<your-project-id>/locations/global/keyRings/webapp/cryptoKeys/appsecrets
+# projects/<your-project-id>/locations/global/keyRings/socialauth/cryptoKeys/appsecrets
 ##############################################################################
-Param ([string]$keyRingId = 'webapp', [string]$keyId = 'appsecrets')
+Param ([string]$keyRingId = 'socialauth', [string]$keyId = 'appsecrets')
 
 # Check to see if the key ring already exists.
 $globalKeyRings = (gcloud kms keyrings list --format json --location global | convertfrom-json).name
