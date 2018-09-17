@@ -1,25 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Diagnostics.AspNetCore;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SocialAuthMVC.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SocialAuthMVC.Data;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SocialAuthMVC
 {
     public class Startup
     {
+        private Lazy<string> _projectId = new Lazy<string>(() => GetProjectId());
+        public string ProjectId
+        {
+            get { return _projectId.Value; }
+        }
+        
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+        }
+
+        private static string GetProjectId() 
+        {
+            GoogleCredential googleCredential = Google.Apis.Auth.OAuth2
+                .GoogleCredential.GetApplicationDefault();
+            if (googleCredential != null)
+            {
+                ICredential credential = googleCredential.UnderlyingCredential;
+                ServiceAccountCredential serviceAccountCredential = 
+                    credential as ServiceAccountCredential;
+                if (serviceAccountCredential != null)
+                {
+                    return serviceAccountCredential.ProjectId;
+                }
+            }
+            return Google.Api.Gax.Platform.Instance().ProjectId;
         }
 
         public IConfiguration Configuration { get; }
@@ -50,7 +76,15 @@ namespace SocialAuthMVC
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.Configure<Models.SecretsModel>(
                 Configuration.GetSection("Secrets"));
+
+            services.AddGoogleExceptionLogging(options => {
+                options.ProjectId = ProjectId;
+                options.ServiceName = "SocialAuthMVC";
+                options.Version = "0.01";
+            });
         }
+
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -62,6 +96,7 @@ namespace SocialAuthMVC
             }
             else
             {
+                app.UseGoogleExceptionLogging();
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
