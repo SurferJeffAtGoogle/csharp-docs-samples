@@ -1,6 +1,7 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Diagnostics.AspNetCore;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -10,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SocialAuthMVC.Data;
+using SocialAuthMVC.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -60,6 +62,8 @@ namespace SocialAuthMVC
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+            services.Configure<KmsDataProtectionProviderOptions>(
+                          Configuration.GetSection("KmsDataProtection"));
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
@@ -76,7 +80,14 @@ namespace SocialAuthMVC
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.Configure<Models.SecretsModel>(
                 Configuration.GetSection("Secrets"));
-
+                
+            services.AddSingleton<Models.GoogleProjectModel>(
+                (provider) => new Models.GoogleProjectModel()
+            {
+                Id = ProjectId
+            });
+            services.AddSingleton<IDataProtectionProvider,
+                KmsDataProtectionProvider>();
             services.AddGoogleExceptionLogging(options => {
                 options.ProjectId = ProjectId;
                 options.ServiceName = "SocialAuthMVC";
