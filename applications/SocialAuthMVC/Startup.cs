@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -115,6 +116,12 @@ namespace SocialAuthMVC
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+
+            // Install the XForwardedProtoRule so middleware knows requests
+            // arrived via https.
+            RewriteOptions rewriteOptions = new RewriteOptions();
+            rewriteOptions.Add(new XForwardedProtoRule());
+            app.UseRewriter(rewriteOptions);
 
             app.UseAuthentication();
 
