@@ -36,7 +36,7 @@ namespace GithubHook.Services
         /// <summary>
         /// Name of the key ring to store the keys in.
         /// </summary>
-        public string KeyRing { get; set; } = "dataprotectionprovider";
+        public string KeyRing { get; set; } = "github-hook-dataprotectionprovider";
     }
 
     /// <summary>

@@ -29,7 +29,7 @@
 # .\New-EncryptionKey.ps1
 # projects/<your-project-id>/locations/global/keyRings/socialauth/cryptoKeys/appsecrets
 ##############################################################################
-Param ([string]$keyRingId = 'appsecrets', [string]$keyId = 'appsecrets')
+Param ([string]$keyRingId = 'github-hook-secrets', [string]$keyId = 'appsecrets')
 
 # Check to see if the key ring already exists.
 $matchingKeyRing = (gcloud kms keyrings list --format json --location global --filter="name~.*/$keyRingId" | convertfrom-json).name

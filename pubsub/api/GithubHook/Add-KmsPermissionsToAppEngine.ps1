@@ -55,7 +55,7 @@ gcloud kms keyrings add-iam-policy-binding $keyRingName `
 # KmsDataProtectionProvider.
 
 # Check to see if the key ring already exists.
-$keyRingId = 'dataprotectionprovider'
+$keyRingId = 'github-hook-dataprotectionprovider'
 # Check to see if the key ring already exists.
 $matchingKeyRing = (gcloud kms keyrings list --format json --location global --filter="name~.*/$keyRingId" | convertfrom-json).name
 if (-not $matchingKeyRing) {
