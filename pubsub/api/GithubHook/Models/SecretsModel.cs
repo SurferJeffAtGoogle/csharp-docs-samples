@@ -16,6 +16,6 @@ namespace GithubHook.Models
 {
     public class SecretsModel
     {
-        public string Word { get; set; }
+        public string GithubSecret { get; set; }
     }
 }
