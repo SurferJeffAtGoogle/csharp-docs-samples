@@ -12,13 +12,16 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 
 namespace GithubHook.Controllers
 {
@@ -35,8 +38,13 @@ namespace GithubHook.Controllers
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        [HttpPost]
         public async Task<ActionResult<HookResponse>> NewPR()
         {
+            HttpRequest request = HttpContext.Request;
+            
+            Stream body = HttpContext.Request.Body;
+            JObject json = JObject.Parse(new StreamReader(body).ReadToEnd());
             return new HookResponse();
         }
     }
