@@ -76,5 +76,4 @@ namespace GoogleCloudSamples
             Assert.Equal(0, result.ExitCode);
         }
     }
-
 }
