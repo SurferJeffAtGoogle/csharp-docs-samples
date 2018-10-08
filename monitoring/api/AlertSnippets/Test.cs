@@ -15,7 +15,9 @@ public class AlertSnippetsTest : IClassFixture<AlertTestFixture>
     [Fact]
     public void TestEnableNotificationChannel()
     {
-        _snippets.EnableNotificationChannel(_fixture.Channel.Name);
+        var channel = _snippets.EnableNotificationChannel(
+            _fixture.Channel.Name);
+        Assert.True(channel.Enabled);
     }
 
     [Fact]

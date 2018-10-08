@@ -5,7 +5,7 @@ using System;
 
 partial class AlertSnippets
 {
-    public void EnableNotificationChannel(
+    public NotificationChannel EnableNotificationChannel(
         string channelName = "projects/your-project-id/notificationChannels/123")
     {
         var client = NotificationChannelServiceClient.Create();
@@ -13,10 +13,11 @@ partial class AlertSnippets
         channel.Enabled = true;
         channel.Name = channelName;
         var fieldMask = new FieldMask { Paths = { "enabled" } };
-        client.UpdateNotificationChannel(
+        channel = client.UpdateNotificationChannel(
             updateMask:fieldMask,
             notificationChannel:channel);
         Console.WriteLine("Enabled {0}.", channel.Name);
+        return channel;
     }
 }
 // [END monitoring_alert_enable_channel]
