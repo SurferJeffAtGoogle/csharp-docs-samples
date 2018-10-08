@@ -4,6 +4,7 @@ using System;
 using static Google.Cloud.Monitoring.V3.Aggregation.Types;
 using static Google.Cloud.Monitoring.V3.AlertPolicy.Types.Condition.Types;
 using static Google.Cloud.Monitoring.V3.AlertPolicy.Types;
+using System.Collections.Generic;
 
 /// <summary>
 /// Creates an AlertPolicy and NotificationChannel for the duration
@@ -11,8 +12,7 @@ using static Google.Cloud.Monitoring.V3.AlertPolicy.Types;
 /// </summary>
 public class AlertTestFixture : IDisposable
 {
-    public AlertTestFixture()
-    {
+    public NotificationChannel CreateChannel() {
         var channel = new NotificationChannel()
         {
             Type = "email",
@@ -27,8 +27,13 @@ public class AlertTestFixture : IDisposable
                     { "division", "fulfillment"}
                 }
         };
-        Channel = NotificationChannelClient.CreateNotificationChannel(
+        return NotificationChannelClient.CreateNotificationChannel(
             new ProjectName(ProjectId), channel);
+    }
+
+    public AlertTestFixture()
+    {
+        Channel = CreateChannel();
 
         Alert = AlertPolicyClient.CreateAlertPolicy(
             new ProjectName(ProjectId), new AlertPolicy()

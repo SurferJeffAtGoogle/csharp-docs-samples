@@ -1,3 +1,4 @@
+// [START monitoring_alert_enable_channel]
 using Google.Cloud.Monitoring.V3;
 using Google.Protobuf.WellKnownTypes;
 using System;
@@ -5,14 +6,17 @@ using System;
 partial class AlertSnippets
 {
     public void EnableNotificationChannel(
-        string policyName = "projects/your-project-id/alertPolicies/123242")
+        string channelName = "projects/your-project-id/notificationChannels/123")
     {
-        var client = AlertPolicyServiceClient.Create();
-        AlertPolicy policy = new AlertPolicy();
-        policy.Enabled = true;
-        policy.Name = policyName;
+        var client = NotificationChannelServiceClient.Create();
+        NotificationChannel channel = new NotificationChannel();
+        channel.Enabled = true;
+        channel.Name = channelName;
         var fieldMask = new FieldMask { Paths = { "enabled" } };
-        client.UpdateAlertPolicy(fieldMask, policy);
-        Console.WriteLine("Enabled {0}.", policy.Name);
+        client.UpdateNotificationChannel(
+            updateMask:fieldMask,
+            notificationChannel:channel);
+        Console.WriteLine("Enabled {0}.", channel.Name);
     }
 }
+// [END monitoring_alert_enable_channel]
