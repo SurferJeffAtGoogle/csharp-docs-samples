@@ -1,12 +1,12 @@
 # Stackdriver Error Reporting Sample
 
-A sample demonstrating how to use the Google Cloud Stackdriver AspNetCore ASP.NET Core NuGet package
+A sample demonstrating how to use the `Google.Cloud.Diagnostics.AspNetCore` NuGet package
 to log all of an ASP.NET web application's errors to the Error Reporting page in the Cloud Platform Console.
 
 This sample requires [.NET Core 2.0](https://www.microsoft.com/net/core) or later.  That means using 
 [Visual Studio 2017](https://www.visualstudio.com/), [Visual Studio Code](https://code.visualstudio.com/), 
 or the command line.  Visual Studio 2015 users can use 
-[this older sample](https://github.com/GoogleCloudPlatform/dotnet-docs-samples/tree/vs2015/error-reporting/api/AspNetCore).
+[this older sample](https://github.com/GoogleCloudPlatform/dotnet-docs-samples/tree/vs2015/error-reporting/api/diagnostics).
 
 ## Links
 
