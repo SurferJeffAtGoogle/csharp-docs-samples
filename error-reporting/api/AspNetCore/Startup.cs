@@ -15,6 +15,7 @@
  */
 
 // [START error_reporting_setup_aspnetcore_using_diagnostics]
+
 using Google.Cloud.Diagnostics.AspNetCore;
 // [END error_reporting_setup_aspnetcore_using_diagnostics]
 using Microsoft.AspNetCore.Builder;
