@@ -16,6 +16,8 @@ docker run -d \
     -e MYGID=$(id -g) \
     -e MYUSERNAME=$(id -un) \
     -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK \
+    -e GOOGLE_PROJECT_ID=$GOOGLE_PROJECT_ID \
+    -e GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS \
     -v $(dirname $SSH_AUTH_SOCK):$(dirname $SSH_AUTH_SOCK) \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
     -v $HOME:$HOME \
