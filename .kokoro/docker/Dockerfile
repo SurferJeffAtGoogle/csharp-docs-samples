@@ -35,14 +35,7 @@ RUN tar xvf casperjs-1.1.4-1.tar.gz
 ENV CASPERJS11_BIN /casperjs-1.1.4-1/bin
 
 # Add debugging tools.
-# RUN apt-get install git vim -y
+RUN apt-get install git vim -y
 
 # Install GDI+ API compatible implementation for cross-plaform System.Drawing
 RUN apt-get install libgdiplus -y
-
-# Install visual studio code
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
-RUN install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/
-RUN sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
-RUN apt-get update
-RUN apt-get install code -y
