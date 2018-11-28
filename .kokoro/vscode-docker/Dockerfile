@@ -7,6 +7,9 @@ RUN sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode st
 RUN apt-get update
 RUN apt-get install code -y
 RUN apt-get install libasound2 -y
+RUN /usr/bin/code --install-extension ms-vscode.csharp -w --user-data-dir /root/.vscode
+RUN /usr/bin/code --install-extension ms-vscode.powershell -w --user-data-dir /root/.vscode
+RUN git clone https://github.com/GoogleCloudPlatform/dotnet-docs-samples.git /root/dotnet-docs-samples
 ENV SHELL /usr/bin/pwsh
 
-ENTRYPOINT [ "/usr/bin/code", "--user-data-dir", "$HOME", "-n", "-w"]
+ENTRYPOINT [ "/usr/bin/code", "--user-data-dir", "/root/.vscode", "-n", "-w", "/root/dotnet-docs-samples"]
