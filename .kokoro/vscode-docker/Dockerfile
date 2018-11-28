@@ -7,5 +7,6 @@ RUN sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode st
 RUN apt-get update
 RUN apt-get install code -y
 RUN apt-get install libasound2 -y
+ENV SHELL /usr/bin/pwsh
 
 ENTRYPOINT [ "/usr/bin/code", "--user-data-dir", "$HOME", "-n", "-w"]

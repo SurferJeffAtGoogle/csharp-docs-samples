@@ -21,5 +21,6 @@ docker run -d \
     -v $(dirname $SSH_AUTH_SOCK):$(dirname $SSH_AUTH_SOCK) \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
     -v $HOME:$HOME \
+    -e HOME=$HOME \
     -w $HOME \
     gcr.io/cloud-devrel-kokoro-resources/dotnet-vscode
