@@ -61,6 +61,13 @@ namespace WebApp
                             new FileSystemXmlRepository(new System.IO.DirectoryInfo("/tmp/sessions"), loggerFactory),
                             provider.GetService<IManagedTracer>(),
                             loggerFactory);
+                        var kmsOptions = new KmsXmlEncryptorOptions {
+                            ProjectId = "surferjeff-test2",
+                            LocationId = "us-central1",
+                            KeyringId = "sessions",
+                            KeyId = "master"
+                        };
+                        options.XmlEncryptor = new KmsXmlEncryptor(Options.Create(kmsOptions));
                     });
                 });
             }
