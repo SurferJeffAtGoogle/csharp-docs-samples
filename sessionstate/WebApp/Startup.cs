@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Google.Cloud.Diagnostics.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -14,6 +16,8 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 
 namespace WebApp
 {
@@ -35,11 +39,31 @@ namespace WebApp
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-            services.AddSingleton<IDataProtectionProvider>(provider =>
-                new TracingDataProtectionProvider(
-                    new KmsDataProtectionProvider("surferjeff-test2", 
-                    "us-central1", "sessions"), 
-                    provider.GetService<IManagedTracer>()));
+            if (false)
+            {
+                // Use KMS.
+                services.AddSingleton<IDataProtectionProvider>(provider =>
+                    new TracingDataProtectionProvider(
+                        new KmsDataProtectionProvider("surferjeff-test2", 
+                        "us-central1", "sessions"), 
+                        provider.GetService<IManagedTracer>()));
+            }
+            else
+            {
+                // Trace the local file implementation of the keystore.
+                var builder = services.AddDataProtection();   
+                builder.Services.AddSingleton<IConfigureOptions<KeyManagementOptions>>(provider =>
+                {
+                    var loggerFactory = provider.GetService<ILoggerFactory>() ?? NullLoggerFactory.Instance;
+                    return new ConfigureOptions<KeyManagementOptions>(options =>
+                    {
+                        options.XmlRepository = new TracingXmlRepository(
+                            new FileSystemXmlRepository(new System.IO.DirectoryInfo("/tmp/sessions"), loggerFactory),
+                            provider.GetService<IManagedTracer>(),
+                            loggerFactory);
+                    });
+                });
+            }
             services.AddSingleton<IDistributedCache>(provider =>
                 new TracingDistributedCache(
                     new DatastoreDistributedCache(provider.GetService<ILoggerFactory>()),
