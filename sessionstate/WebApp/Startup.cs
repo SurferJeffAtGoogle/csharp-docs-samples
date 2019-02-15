@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Google.Cloud.Diagnostics.Common;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -35,7 +36,10 @@ namespace WebApp
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
             services.AddSingleton<IDataProtectionProvider>(provider =>
-                new KmsDataProtectionProvider("surferjeff-test2", ");
+                new TracingDataProtectionProvider(
+                    new KmsDataProtectionProvider("surferjeff-test2", 
+                    "us-central1", "sessions"), 
+                    provider.GetService<IManagedTracer>()));
             services.AddSingleton<IDistributedCache>(provider =>
                 new TracingDistributedCache(
                     new DatastoreDistributedCache(provider.GetService<ILoggerFactory>()),

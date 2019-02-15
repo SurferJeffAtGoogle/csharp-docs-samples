@@ -26,6 +26,62 @@ using System.Text;
 
 namespace WebApp
 {
+    public class TracingDataProtector : IDataProtector
+    {
+        private readonly IDataProtector _inner;
+        private readonly IManagedTracer _tracer;
+
+        public TracingDataProtector(IDataProtector inner,
+            IManagedTracer tracer)
+        {
+            this._inner = inner;
+            this._tracer = tracer;
+        }
+
+        public IDataProtector CreateProtector(string purpose)
+        {
+            using (_tracer.StartSpan($"CreateProtector({purpose})"))
+            {
+                return _inner.CreateProtector(purpose);
+            }
+        }
+
+        public byte[] Protect(byte[] plaintext)
+        {
+            using (_tracer.StartSpan("Protect()"))
+            {
+                return _inner.Protect(plaintext);
+            }
+        }
+
+        public byte[] Unprotect(byte[] protectedData)
+        {
+            using (_tracer.StartSpan("Unprotect()"))
+            {
+                return _inner.Unprotect(protectedData);
+            }
+        }
+    }
+
+    public class TracingDataProtectionProvider : IDataProtectionProvider
+    {
+        private readonly IDataProtectionProvider _inner;
+        private readonly IManagedTracer _tracer;
+
+        public TracingDataProtectionProvider(IDataProtectionProvider inner,
+            IManagedTracer tracer)
+        {
+            this._inner = inner;
+            this._tracer = tracer;
+        }
+
+        public IDataProtector CreateProtector(string purpose)
+        {
+            return new TracingDataProtector(_inner.CreateProtector(purpose),
+                _tracer);
+        }
+    }
+
     /// <summary>
     /// Implements a DataProtectionProvider using Google's Cloud Key
     /// Management Service.  https://cloud.google.com/kms/
@@ -40,7 +96,6 @@ namespace WebApp
         private readonly string _googleProjectId;
         private readonly string _keyRingLocation;
         private readonly string _keyRingId;
-        private readonly IManagedTracer _tracer;
 
         // Keep a cache of DataProtectors we create to reduce calls to the
         // _kms service.
@@ -51,8 +106,7 @@ namespace WebApp
         public KmsDataProtectionProvider(
             string googleProjectId,
             string keyRingLocation,
-            string keyRingId,
-            IManagedTracer tracer)
+            string keyRingId)
         {
             _googleProjectId = googleProjectId ??
                 throw new ArgumentNullException(nameof(googleProjectId));
@@ -60,7 +114,6 @@ namespace WebApp
                 throw new ArgumentNullException(nameof(keyRingLocation));
             _keyRingId = keyRingId ??
                 throw new ArgumentNullException(nameof(keyRingId));
-            this._tracer = tracer;
             _kms = KeyManagementServiceClient.Create();
             _keyRingName = new KeyRingName(_googleProjectId,
                 _keyRingLocation, _keyRingId);
@@ -111,7 +164,7 @@ namespace WebApp
             }
             var newProtector = new KmsDataProtector(_kms, keyName,
                 (string innerPurpose) =>
-                this.CreateProtector($"{purpose}.{innerPurpose}"), _tracer);
+                this.CreateProtector($"{purpose}.{innerPurpose}"));
             _dataProtectorCache.TryAdd(purpose, newProtector);
             return newProtector;
         }
@@ -181,19 +234,16 @@ namespace WebApp
         private readonly CryptoKeyName _keyName;
         private readonly CryptoKeyPathName _keyPathName;
         private readonly Func<string, IDataProtector> _dataProtectorFactory;
-        private readonly IManagedTracer _tracer;
 
         internal KmsDataProtector(KeyManagementServiceClient kms,
             CryptoKeyName keyName,
-            Func<string, IDataProtector> dataProtectorFactory,
-            IManagedTracer tracer)
+            Func<string, IDataProtector> dataProtectorFactory)
         {
             _kms = kms;
             _keyName = keyName;
             _keyPathName = new CryptoKeyPathName(keyName.ProjectId,
                 keyName.LocationId, keyName.KeyRingId, keyName.CryptoKeyId);
             _dataProtectorFactory = dataProtectorFactory;
-            this._tracer = tracer;
         }
 
         IDataProtector IDataProtectionProvider.CreateProtector(string purpose)
@@ -203,22 +253,16 @@ namespace WebApp
 
         byte[] IDataProtector.Protect(byte[] plaintext)
         {
-            using (_tracer.StartSpan($"Protect({_keyName.CryptoKeyId}"))
-            {
-                var response =
-                    _kms.Encrypt(_keyPathName, ByteString.CopyFrom(plaintext));
-                return response.Ciphertext.ToByteArray();
-            }
+            var response =
+                _kms.Encrypt(_keyPathName, ByteString.CopyFrom(plaintext));
+            return response.Ciphertext.ToByteArray();
         }
 
         byte[] IDataProtector.Unprotect(byte[] protectedData)
         {
-            using (_tracer.StartSpan($"Unprotect({_keyName.CryptoKeyId}"))
-            {
-                var response =
-                    _kms.Decrypt(_keyName, ByteString.CopyFrom(protectedData));
-                return response.Plaintext.ToByteArray();
-            }
+            var response =
+                _kms.Decrypt(_keyName, ByteString.CopyFrom(protectedData));
+            return response.Plaintext.ToByteArray();
         }
     }
 }
