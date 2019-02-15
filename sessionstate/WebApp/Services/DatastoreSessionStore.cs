@@ -16,6 +16,81 @@ using Microsoft.Extensions.Logging;
 
 namespace WebApp
 {
+    class TracingDistributedCache : IDistributedCache
+    {
+        private readonly IDistributedCache _inner;
+        private readonly IManagedTracer _tracer;
+
+        public TracingDistributedCache(IDistributedCache inner, IManagedTracer tracer)
+        {
+            this._inner = inner;
+            this._tracer = tracer;
+        }
+
+        public byte[] Get(string key)
+        {
+            using (_tracer.StartSpan($"Get({key})"))
+            {
+                return _inner.Get(key);
+            }
+        }
+
+        public async Task<byte[]> GetAsync(string key, CancellationToken token = default(CancellationToken))
+        {
+            using (_tracer.StartSpan($"GetAsync({key})"))
+            {
+                return await _inner.GetAsync(key, token);
+            }
+        }
+
+        public void Refresh(string key)
+        {
+            using (_tracer.StartSpan($"Refresh({key})"))
+            {
+                _inner.Refresh(key);
+            }
+        }
+
+        public async Task RefreshAsync(string key, CancellationToken token = default(CancellationToken))
+        {
+            using (_tracer.StartSpan($"RefreshAsync({key})"))
+            {
+                await _inner.RefreshAsync(key, token);
+            }
+        }
+
+        public void Remove(string key)
+        {
+            using (_tracer.StartSpan($"Remove({key})"))
+            {
+                _inner.Remove(key);
+            }
+        }
+
+        public async Task RemoveAsync(string key, CancellationToken token = default(CancellationToken))
+        {
+            using (_tracer.StartSpan($"RemoveAsync({key})"))
+            {
+                await _inner.RemoveAsync(key, token);
+            }
+        }
+
+        public void Set(string key, byte[] value, DistributedCacheEntryOptions options)
+        {
+            using (_tracer.StartSpan($"Set({key})"))
+            {
+                _inner.Set(key, value, options);
+            }
+        }
+
+        public async Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions options, CancellationToken token = default(CancellationToken))
+        {
+            using (_tracer.StartSpan($"SetAsync({key})"))
+            { 
+                await _inner.SetAsync(key, value, options, token);
+            }
+        }
+    }
 
     class DatastoreDistributedCache : IDistributedCache
     {
@@ -24,21 +99,18 @@ namespace WebApp
         readonly string _namespaceId;
         readonly KeyFactory _keyFactory;
         readonly ILogger<DatastoreDistributedCache> _logger;
-        private readonly IManagedTracer _tracer;
         const string CACHE_ENTRY = "CacheEntry",
             EXPIRES = "expires",
             ATIME = "atime",
             SLIDING_EXPIRATION_SECONDS = "seconds";
 
-        public DatastoreDistributedCache(ILoggerFactory loggerFactory,
-            IManagedTracer tracer)
+        public DatastoreDistributedCache(ILoggerFactory loggerFactory)
         {
             _logger = loggerFactory.CreateLogger<DatastoreDistributedCache>();
             _projectId = GetProjectId();
             _namespaceId = "";
             _datastore = DatastoreDb.Create(_projectId, _namespaceId);
             _keyFactory = new KeyFactory(_projectId, _namespaceId, CACHE_ENTRY);
-            this._tracer = tracer;
         }
 
         private static string GetProjectId()
@@ -58,28 +130,22 @@ namespace WebApp
             return Google.Api.Gax.Platform.Instance().ProjectId;
         }
 
-        public byte[] Get(string cacheKey) 
+        public byte[] Get(string cacheKey)
         {
-            using (_tracer.StartSpan($"Get({cacheKey})"))
-            {
-                return UnpackEntities(_datastore.Lookup(CreateBothKeys(cacheKey)));
-            }
+            return UnpackEntities(_datastore.Lookup(CreateBothKeys(cacheKey)));
         }
 
         public async Task<byte[]> GetAsync(string cacheKey, CancellationToken token = default(CancellationToken))
         {
-            using (_tracer.StartSpan($"GetAsync({cacheKey})"))
-            {
-                return
-                UnpackEntities(await _datastore.LookupAsync(
-                    CreateBothKeys(cacheKey),  null,
-                    CallSettings.FromCancellationToken(token) ));
-            }
+            return
+            UnpackEntities(await _datastore.LookupAsync(
+                CreateBothKeys(cacheKey), null,
+                CallSettings.FromCancellationToken(token)));
         }
 
-        byte[] UnpackEntities(IEnumerable<Entity> entities) 
+        byte[] UnpackEntities(IEnumerable<Entity> entities)
         {
-            if (entities.Count() != 2) 
+            if (entities.Count() != 2)
             {
                 return null;  // Doesn't exist.
             }
@@ -115,67 +181,56 @@ namespace WebApp
         }
 
         // Refreshes a value in the cache based on its key, resetting its sliding expiration timeout (if any).
-        public void Refresh(string cacheKey) 
+        public void Refresh(string cacheKey)
         {
             _logger.LogTrace($"Refresh({cacheKey})");
-            using (_tracer.StartSpan($"Refresh({cacheKey})"))
-            {
-                _datastore.Upsert(CreateAtime(cacheKey));
-            }
+            _datastore.Upsert(CreateAtime(cacheKey));
         }
 
         public async Task RefreshAsync(string cacheKey, CancellationToken token = default(CancellationToken))
         {
             _logger.LogTrace($"RefreshAsync({cacheKey})");
-            using (_tracer.StartSpan($"RefreshAsync({cacheKey})"))
-            {
-                await _datastore.UpsertAsync(CreateAtime(cacheKey),
-                    CallSettings.FromCancellationToken(token));
-            }
+            await _datastore.UpsertAsync(CreateAtime(cacheKey),
+                CallSettings.FromCancellationToken(token));
         }
 
         public void Remove(string cacheKey) =>
             _datastore.Delete(CreateBothKeys(cacheKey));
 
         public Task RemoveAsync(string cacheKey, CancellationToken token = default(CancellationToken)) =>
-            _datastore.DeleteAsync(CreateBothKeys(cacheKey), 
+            _datastore.DeleteAsync(CreateBothKeys(cacheKey),
                 CallSettings.FromCancellationToken(token));
 
         public void Set(string cacheKey, byte[] value, DistributedCacheEntryOptions options)
         {
             _logger.LogTrace($"Set({cacheKey})");
-            using (_tracer.StartSpan($"Set({cacheKey})"))
-            {
-                var entities = new [] { CreateEntity(cacheKey, value, options),
-                    CreateAtime(cacheKey) };
-                _datastore.Upsert(entities);
-            }
+            var entities = new[] { CreateEntity(cacheKey, value, options),
+                CreateAtime(cacheKey) };
+            _datastore.Upsert(entities);
         }
 
-        public async Task SetAsync(string cacheKey, byte[] value, 
-            DistributedCacheEntryOptions options, 
+        public async Task SetAsync(string cacheKey, byte[] value,
+            DistributedCacheEntryOptions options,
             CancellationToken token = default(CancellationToken))
         {
             _logger.LogTrace($"SetAsync({cacheKey})");
-            using (_tracer.StartSpan($"SetAsync({cacheKey})"))
-            {
-                var entities = new [] { CreateEntity(cacheKey, value, options),
-                    CreateAtime(cacheKey) };
-                await _datastore.UpsertAsync(
-                    entities, CallSettings.FromCancellationToken(token));
-            }
+            var entities = new[] { CreateEntity(cacheKey, value, options),
+                CreateAtime(cacheKey) };
+            await _datastore.UpsertAsync(
+                entities, CallSettings.FromCancellationToken(token));
         }
 
-        Entity CreateEntity(string cacheKey, byte[] value, 
+        Entity CreateEntity(string cacheKey, byte[] value,
             DistributedCacheEntryOptions options)
         {
             var now = DateTime.UtcNow;
-            var entity = new Entity() {
+            var entity = new Entity()
+            {
                 Key = CreateEntityKey(cacheKey),
                 ["payload"] = ByteString.CopyFrom(value),
             };
             entity["payload"].ExcludeFromIndexes = true;
-            if (options.AbsoluteExpiration.HasValue) 
+            if (options.AbsoluteExpiration.HasValue)
             {
                 entity[EXPIRES] = Timestamp.FromDateTimeOffset(
                     options.AbsoluteExpiration.Value);
@@ -187,16 +242,17 @@ namespace WebApp
             }
             if (options.SlidingExpiration.HasValue)
             {
-                entity[SLIDING_EXPIRATION_SECONDS] = 
+                entity[SLIDING_EXPIRATION_SECONDS] =
                     options.SlidingExpiration.Value.TotalSeconds;
                 entity[SLIDING_EXPIRATION_SECONDS].ExcludeFromIndexes = true;
             }
             return entity;
         }
 
-        Entity CreateAtime(string cacheKey) 
+        Entity CreateAtime(string cacheKey)
         {
-            var atime = new Entity() {
+            var atime = new Entity()
+            {
                 Key = CreateAtimeKey(cacheKey),
                 [ATIME] = Timestamp.FromDateTime(DateTime.UtcNow)
             };
@@ -223,15 +279,14 @@ namespace WebApp
     {
         readonly DistributedSessionStore _distributedSessionStore;
 
-        public DatastoreSessionStore(ILoggerFactory loggerFactory,
-            IManagedTracer tracer)
+        public DatastoreSessionStore(ILoggerFactory loggerFactory)
         {
             _distributedSessionStore = new DistributedSessionStore(
-                new DatastoreDistributedCache(loggerFactory, tracer), loggerFactory);
+                new DatastoreDistributedCache(loggerFactory), loggerFactory);
         }
 
-        public ISession Create(string sessionKey, TimeSpan idleTimeout, 
-            TimeSpan ioTimeout, Func<bool> tryEstablishSession, 
+        public ISession Create(string sessionKey, TimeSpan idleTimeout,
+            TimeSpan ioTimeout, Func<bool> tryEstablishSession,
             bool isNewSessionKey)
         {
             return _distributedSessionStore.Create(sessionKey, idleTimeout,
