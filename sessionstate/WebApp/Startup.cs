@@ -34,6 +34,8 @@ namespace WebApp
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+            services.AddSingleton<IDataProtectionProvider>(provider =>
+                new KmsDataProtectionProvider("surferjeff-test2", ");
             services.AddSingleton<IDistributedCache>(provider =>
                 new TracingDistributedCache(
                     new DatastoreDistributedCache(provider.GetService<ILoggerFactory>()),

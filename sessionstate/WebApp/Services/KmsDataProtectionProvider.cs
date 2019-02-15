@@ -203,16 +203,22 @@ namespace WebApp
 
         byte[] IDataProtector.Protect(byte[] plaintext)
         {
-            var response =
-                _kms.Encrypt(_keyPathName, ByteString.CopyFrom(plaintext));
-            return response.Ciphertext.ToByteArray();
+            using (_tracer.StartSpan($"Protect({_keyName.CryptoKeyId}"))
+            {
+                var response =
+                    _kms.Encrypt(_keyPathName, ByteString.CopyFrom(plaintext));
+                return response.Ciphertext.ToByteArray();
+            }
         }
 
         byte[] IDataProtector.Unprotect(byte[] protectedData)
         {
-            var response =
-                _kms.Decrypt(_keyName, ByteString.CopyFrom(protectedData));
-            return response.Plaintext.ToByteArray();
+            using (_tracer.StartSpan($"Unprotect({_keyName.CryptoKeyId}"))
+            {
+                var response =
+                    _kms.Decrypt(_keyName, ByteString.CopyFrom(protectedData));
+                return response.Plaintext.ToByteArray();
+            }
         }
     }
 }
