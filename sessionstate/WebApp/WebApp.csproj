@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.Cloud.Datastore.V1" Version="2.2.0-beta01" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
