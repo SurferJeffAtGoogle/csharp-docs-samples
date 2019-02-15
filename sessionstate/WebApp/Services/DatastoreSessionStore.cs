@@ -107,10 +107,10 @@ namespace WebApp
                 CallSettings.FromCancellationToken(token));
 
         public void Remove(string cacheKey) =>
-            _datastore.Delete(CreateEntityKey(cacheKey));
+            _datastore.Delete(CreateBothKeys(cacheKey));
 
         public Task RemoveAsync(string cacheKey, CancellationToken token = default(CancellationToken)) =>
-            _datastore.DeleteAsync(CreateEntityKey(cacheKey), 
+            _datastore.DeleteAsync(CreateBothKeys(cacheKey), 
                 CallSettings.FromCancellationToken(token));
 
         public void Set(string cacheKey, byte[] value, DistributedCacheEntryOptions options)
