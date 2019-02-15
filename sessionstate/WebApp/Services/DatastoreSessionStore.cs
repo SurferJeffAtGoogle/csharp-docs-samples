@@ -23,12 +23,17 @@ namespace WebApp
         readonly string _namespaceId;
         readonly KeyFactory _keyFactory;
 
+        const string CACHE_ENTRY = "CacheEntry",
+            EXPIRES = "expires",
+            ATIME = "atime",
+            SLIDING_EXPIRATION_SECONDS = "seconds";
+
         public DatastoreDistributedCache()
         {
             _projectId = GetProjectId();
             _namespaceId = "";
             _datastore = DatastoreDb.Create(_projectId, _namespaceId);
-            _keyFactory = new KeyFactory(_projectId, _namespaceId, "WebSession");
+            _keyFactory = new KeyFactory(_projectId, _namespaceId, CACHE_ENTRY);
         }
 
         private static string GetProjectId()
@@ -70,7 +75,7 @@ namespace WebApp
             }
             Google.Cloud.Datastore.V1.Value expires;
             var now = DateTime.UtcNow;
-            if (entity.Properties.TryGetValue("expires", out expires))
+            if (entity.Properties.TryGetValue(EXPIRES, out expires))
             {
                 if (expires.TimestampValue.ToDateTime() < now)
                 {
@@ -79,9 +84,9 @@ namespace WebApp
             }
             Google.Cloud.Datastore.V1.Value slidingExpirationSeconds;
             Google.Cloud.Datastore.V1.Value atimeValue;
-            if (entity.Properties.TryGetValue("slidingExpirationSeconds",
+            if (entity.Properties.TryGetValue(SLIDING_EXPIRATION_SECONDS,
                 out slidingExpirationSeconds) &&
-                atime.Properties.TryGetValue("atime", out atimeValue))
+                atime.Properties.TryGetValue(ATIME, out atimeValue))
             {
                 if (atimeValue.TimestampValue.ToDateTime().Add(
                     TimeSpan.FromSeconds((double)slidingExpirationSeconds))
@@ -133,20 +138,22 @@ namespace WebApp
                 Key = CreateEntityKey(cacheKey),
                 ["payload"] = ByteString.CopyFrom(value),
             };
+            entity["payload"].ExcludeFromIndexes = true;
             if (options.AbsoluteExpiration.HasValue) 
             {
-                entity["expires"] = Timestamp.FromDateTimeOffset(
+                entity[EXPIRES] = Timestamp.FromDateTimeOffset(
                     options.AbsoluteExpiration.Value);
             }
             else if (options.AbsoluteExpirationRelativeToNow.HasValue)
             {
-                entity["expires"] = Timestamp.FromDateTime(
+                entity[EXPIRES] = Timestamp.FromDateTime(
                     now.Add(options.AbsoluteExpirationRelativeToNow.Value));
             }
             if (options.SlidingExpiration.HasValue)
             {
-                entity["slidingExpirationSeconds"] = 
+                entity[SLIDING_EXPIRATION_SECONDS] = 
                     options.SlidingExpiration.Value.TotalSeconds;
+                entity[SLIDING_EXPIRATION_SECONDS].ExcludeFromIndexes = true;
             }
             return entity;
         }
@@ -155,7 +162,7 @@ namespace WebApp
         {
             var atime = new Entity() {
                 Key = CreateAtimeKey(cacheKey),
-                ["atime"] = Timestamp.FromDateTime(DateTime.UtcNow)
+                [ATIME] = Timestamp.FromDateTime(DateTime.UtcNow)
             };
             return atime;
         }
@@ -164,7 +171,7 @@ namespace WebApp
             _keyFactory.CreateKey(cacheKey);
 
         Key CreateAtimeKey(Key entityKey) =>
-            new KeyFactory(entityKey, "atime").CreateKey(2);
+            new KeyFactory(entityKey, ATIME).CreateKey(1);
 
         Key CreateAtimeKey(string cacheKey) =>
             CreateAtimeKey(CreateEntityKey(cacheKey));
@@ -174,7 +181,6 @@ namespace WebApp
             var entityKey = CreateEntityKey(cacheKey);
             return new Key[] { entityKey, CreateAtimeKey(entityKey) };
         }
-
     }
 
     public class DatastoreSessionStore : ISessionStore
