@@ -42,7 +42,8 @@ namespace WebApp
         {
             using (_tracer.StartSpan($"CreateProtector({purpose})"))
             {
-                return _inner.CreateProtector(purpose);
+                return new TracingDataProtector(_inner.CreateProtector(purpose),
+                    _tracer);
             }
         }
 
@@ -50,7 +51,8 @@ namespace WebApp
         {
             using (_tracer.StartSpan("Protect()"))
             {
-                return _inner.Protect(plaintext);
+                var result = _inner.Protect(plaintext);
+                return result;
             }
         }
 
@@ -58,7 +60,8 @@ namespace WebApp
         {
             using (_tracer.StartSpan("Unprotect()"))
             {
-                return _inner.Unprotect(protectedData);
+                var result = _inner.Unprotect(protectedData);
+                return result;
             }
         }
     }
@@ -77,8 +80,11 @@ namespace WebApp
 
         public IDataProtector CreateProtector(string purpose)
         {
-            return new TracingDataProtector(_inner.CreateProtector(purpose),
-                _tracer);
+            using (_tracer.StartSpan($"CreateProtector({purpose})"))
+            {
+                return new TracingDataProtector(_inner.CreateProtector(purpose),
+                    _tracer);
+            }
         }
     }
 
