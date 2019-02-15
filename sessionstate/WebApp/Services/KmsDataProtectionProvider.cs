@@ -14,6 +14,7 @@
  * the License.
  */
 
+using Google.Cloud.Diagnostics.Common;
 using Google.Cloud.Kms.V1;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
@@ -39,6 +40,7 @@ namespace WebApp
         private readonly string _googleProjectId;
         private readonly string _keyRingLocation;
         private readonly string _keyRingId;
+        private readonly IManagedTracer _tracer;
 
         // Keep a cache of DataProtectors we create to reduce calls to the
         // _kms service.
@@ -49,7 +51,8 @@ namespace WebApp
         public KmsDataProtectionProvider(
             string googleProjectId,
             string keyRingLocation,
-            string keyRingId)
+            string keyRingId,
+            IManagedTracer tracer)
         {
             _googleProjectId = googleProjectId ??
                 throw new ArgumentNullException(nameof(googleProjectId));
@@ -57,6 +60,7 @@ namespace WebApp
                 throw new ArgumentNullException(nameof(keyRingLocation));
             _keyRingId = keyRingId ??
                 throw new ArgumentNullException(nameof(keyRingId));
+            this._tracer = tracer;
             _kms = KeyManagementServiceClient.Create();
             _keyRingName = new KeyRingName(_googleProjectId,
                 _keyRingLocation, _keyRingId);
@@ -107,7 +111,7 @@ namespace WebApp
             }
             var newProtector = new KmsDataProtector(_kms, keyName,
                 (string innerPurpose) =>
-                this.CreateProtector($"{purpose}.{innerPurpose}"));
+                this.CreateProtector($"{purpose}.{innerPurpose}"), _tracer);
             _dataProtectorCache.TryAdd(purpose, newProtector);
             return newProtector;
         }
@@ -177,16 +181,19 @@ namespace WebApp
         private readonly CryptoKeyName _keyName;
         private readonly CryptoKeyPathName _keyPathName;
         private readonly Func<string, IDataProtector> _dataProtectorFactory;
+        private readonly IManagedTracer _tracer;
 
         internal KmsDataProtector(KeyManagementServiceClient kms,
             CryptoKeyName keyName,
-            Func<string, IDataProtector> dataProtectorFactory)
+            Func<string, IDataProtector> dataProtectorFactory,
+            IManagedTracer tracer)
         {
             _kms = kms;
             _keyName = keyName;
             _keyPathName = new CryptoKeyPathName(keyName.ProjectId,
                 keyName.LocationId, keyName.KeyRingId, keyName.CryptoKeyId);
             _dataProtectorFactory = dataProtectorFactory;
+            this._tracer = tracer;
         }
 
         IDataProtector IDataProtectionProvider.CreateProtector(string purpose)

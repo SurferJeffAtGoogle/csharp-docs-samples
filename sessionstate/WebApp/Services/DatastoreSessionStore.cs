@@ -124,12 +124,12 @@ namespace WebApp
             }
         }
 
-        public Task RefreshAsync(string cacheKey, CancellationToken token = default(CancellationToken))
+        public async Task RefreshAsync(string cacheKey, CancellationToken token = default(CancellationToken))
         {
             _logger.LogTrace($"RefreshAsync({cacheKey})");
             using (_tracer.StartSpan($"RefreshAsync({cacheKey})"))
             {
-                return _datastore.UpsertAsync(CreateAtime(cacheKey),
+                await _datastore.UpsertAsync(CreateAtime(cacheKey),
                     CallSettings.FromCancellationToken(token));
             }
         }
@@ -152,7 +152,7 @@ namespace WebApp
             }
         }
 
-        public Task SetAsync(string cacheKey, byte[] value, 
+        public async Task SetAsync(string cacheKey, byte[] value, 
             DistributedCacheEntryOptions options, 
             CancellationToken token = default(CancellationToken))
         {
@@ -161,7 +161,7 @@ namespace WebApp
             {
                 var entities = new [] { CreateEntity(cacheKey, value, options),
                     CreateAtime(cacheKey) };
-                return _datastore.UpsertAsync(
+                await _datastore.UpsertAsync(
                     entities, CallSettings.FromCancellationToken(token));
             }
         }
