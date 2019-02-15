@@ -20,7 +20,7 @@ namespace WebApp
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseGoogleDiagnostics("surferjeff-test2", "session-test", "datastore")
+                .UseGoogleDiagnostics("surferjeff-test2", "session-test", "kms-datastore")
                 .UseStartup<Startup>();
     }
 }

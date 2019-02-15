@@ -1,7 +1,9 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
+using Google.Cloud.Datastore.V1;
 using Google.Cloud.Diagnostics.Common;
 using Google.Cloud.Storage.V1;
 using Microsoft.AspNetCore.DataProtection.Repositories;
@@ -45,42 +47,50 @@ namespace WebApp
         }
     }
 
-    class CloudStorageXmlRepository : IXmlRepository
+    class DataStoreXmlRepository : IXmlRepository
     {
-        private readonly IOptions<Options> _options;
-        private readonly ILogger<CloudStorageXmlRepository> _logger;
-        private readonly StorageClient _storage;
+        private readonly ILogger<DataStoreXmlRepository> _logger;
+        private readonly DatastoreDb _datastore;
 
         public class Options 
         {
-            public string BucketName { get; set; }
-            public string DirName { get; set; }
+            public string ProjectId { get; set; }
+            public string Namespace { get; set; } = "";
         }
 
-        public CloudStorageXmlRepository(IOptions<Options> options,
-            ILogger<CloudStorageXmlRepository> logger)
+        private const string KIND = "XElement", ROOT = "root";
+        KeyFactory _keyFactory;
+
+        public DataStoreXmlRepository(IOptions<Options> options,
+            ILogger<DataStoreXmlRepository> logger)
         {
-            this._options = options;
             this._logger = logger;
-            _storage = StorageClient.Create();
+            var opts = options.Value;
+            _datastore = DatastoreDb.Create(opts.ProjectId, opts.Namespace);
+            _keyFactory = _datastore.CreateKeyFactory(KIND);
         }
-
         public IReadOnlyCollection<XElement> GetAllElements()
         {
-            // This isn't going to work because cloud storage is eventually
-            // consistent.  Elements that were recently stored will not
-            // be found.
-            throw new System.NotImplementedException();
+            var query = new Query(KIND) 
+            {
+                Filter = Filter.HasAncestor(_keyFactory.CreateKey(ROOT))
+            };
+            var response = _datastore.RunQuery(query);
+            var xelements = response.Entities.Select(entity =>
+                XElement.Parse((string)entity[KIND]));
+            return xelements.ToList();
         }
 
         public void StoreElement(XElement element, string friendlyName)
         {
-            var opts = _options.Value;
-            var stream = new MemoryStream();
-            element.Save(stream);
-            stream.Seek(0, SeekOrigin.Begin);
-            _storage.UploadObject(opts.BucketName, friendlyName, "text/xml",
-                stream);
+            Entity entity = new Entity() 
+            {
+                Key = new KeyFactory(_keyFactory.CreateKey(ROOT), KIND)
+                    .CreateKey(friendlyName),
+                [KIND] = element.ToString()
+            };
+            entity[KIND].ExcludeFromIndexes = true;
+            _datastore.Upsert(entity);
         }
     }
 }

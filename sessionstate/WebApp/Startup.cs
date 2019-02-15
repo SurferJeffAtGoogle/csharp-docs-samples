@@ -57,10 +57,25 @@ namespace WebApp
                     var loggerFactory = provider.GetService<ILoggerFactory>() ?? NullLoggerFactory.Instance;
                     return new ConfigureOptions<KeyManagementOptions>(options =>
                     {
-                        options.XmlRepository = new TracingXmlRepository(
-                            new FileSystemXmlRepository(new System.IO.DirectoryInfo("/tmp/sessions"), loggerFactory),
-                            provider.GetService<IManagedTracer>(),
-                            loggerFactory);
+                        if (false) 
+                        {
+                            options.XmlRepository = new TracingXmlRepository(
+                                new FileSystemXmlRepository(new System.IO.DirectoryInfo("/tmp/sessions"), loggerFactory),
+                                provider.GetService<IManagedTracer>(),
+                                loggerFactory);
+                        }
+                        else
+                        {
+                            var datastoreOptions = new DataStoreXmlRepository.Options() {
+                                ProjectId = "surferjeff-test2"
+                            };
+                            options.XmlRepository = new TracingXmlRepository(
+                                new DataStoreXmlRepository(
+                                    Options.Create(datastoreOptions),
+                                    loggerFactory.CreateLogger<DataStoreXmlRepository>()),
+                                provider.GetService<IManagedTracer>(),
+                                loggerFactory);
+                        }
                         var kmsOptions = new KmsXmlEncryptorOptions {
                             ProjectId = "surferjeff-test2",
                             LocationId = "us-central1",
