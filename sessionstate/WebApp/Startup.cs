@@ -89,8 +89,7 @@ namespace WebApp
             }
             var redisOptions = new RedisCacheOptions()
             {
-                InstanceName = "10.240.0.88",
-                Configuration = "FgRKPoJPhUz3"
+                Configuration = "10.240.0.89,password=zG6WkNaCkhun"
             };
             services.AddSingleton<IDistributedCache>(provider =>
                 new TracingDistributedCache(
