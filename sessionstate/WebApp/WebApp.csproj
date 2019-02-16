@@ -10,6 +10,7 @@
     <PackageReference Include="Google.Cloud.Kms.V1" Version="1.0.0" />
     <PackageReference Include="Google.Cloud.Storage.V1" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.1.2" />
   </ItemGroup>
 
 </Project>

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Session;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Redis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -86,9 +87,14 @@ namespace WebApp
                     });
                 });
             }
+            var redisOptions = new RedisCacheOptions()
+            {
+                InstanceName = "10.240.0.88",
+                Configuration = "FgRKPoJPhUz3"
+            };
             services.AddSingleton<IDistributedCache>(provider =>
                 new TracingDistributedCache(
-                    new DatastoreDistributedCache(provider.GetService<ILoggerFactory>()),
+                    new RedisCache(Options.Create(redisOptions)),
                     provider.GetService<IManagedTracer>()));
             services.AddSession();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
