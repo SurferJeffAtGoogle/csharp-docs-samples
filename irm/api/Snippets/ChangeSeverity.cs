@@ -30,7 +30,6 @@ class IrmChangeSeverity
         // Create client
         IncidentServiceClient incidentServiceClient =
             IncidentServiceClient.Create();
-
         // Update the severity.
         Incident incidentChange = new Incident()
         {
