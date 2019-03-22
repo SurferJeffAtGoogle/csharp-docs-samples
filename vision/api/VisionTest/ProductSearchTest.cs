@@ -26,6 +26,7 @@ namespace GoogleCloudSamples
 
         private readonly string _projectId = Environment.GetEnvironmentVariable("GOOGLE_PROJECT_ID");
 
+        readonly RetryRobot _retryRobot = new RetryRobot();
         readonly CommandLineRunner _productSearch = new CommandLineRunner()
         {
             Main = ProductSearchProgram.Main,
@@ -202,12 +203,14 @@ namespace GoogleCloudSamples
             output = _productSearch.Run("import_product_set", _projectId, REGION_NAME, CSV_GCS_URI);
             Assert.Equal(0, output.ExitCode);
 
-            output = _productSearch.Run("list_product_sets", _projectId, REGION_NAME);
-            Assert.Contains(PRODUCT_SET_ID, output.Stdout);
+            _retryRobot.Eventually(() => {
+                output = _productSearch.Run("list_product_sets", _projectId, REGION_NAME);
+                Assert.Contains(PRODUCT_SET_ID, output.Stdout);
 
-            output = _productSearch.Run("list_products", _projectId, REGION_NAME);
-            Assert.Contains(PRODUCT_ID, output.Stdout);
-            Assert.Contains(PRODUCT_ID_2, output.Stdout);
+                output = _productSearch.Run("list_products", _projectId, REGION_NAME);
+                Assert.Contains(PRODUCT_ID, output.Stdout);
+                Assert.Contains(PRODUCT_ID_2, output.Stdout);
+            });
         }
 
         [Fact]
