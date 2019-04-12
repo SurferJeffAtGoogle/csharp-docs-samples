@@ -1,0 +1,14 @@
+﻿@model HomeIndexViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h1>Hello Tool</h1>
+<form asp-controller="Home" asp-action="Index" method="post">
+    @if (Model?.Name != null) {
+        <h2>@Model.Greeting @Model.Name</h2>
+    }
+    <label asp-for="Name">Enter your name for a custom greeting: </label>
+    <input asp-for="Name" autofocus />
+    <input type="submit">
+</form>        
