@@ -1,5 +1,14 @@
-﻿@{
+﻿@model HomeIndexViewModel
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<h1>Jeff</h1>
+<h1>Uppercase Tool</h1>
+<form asp-controller="Home" asp-action="Index" method="post">
+    @if (Model?.Word != null) {
+        <h2>@Model.Word</h2>
+    }
+    <label asp-for="Word">Enter a word to convert to uppercase: </label>
+    <input asp-for="Word" autofocus />
+    <input type="submit">
+</form>        
