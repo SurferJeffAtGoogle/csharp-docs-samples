@@ -32,19 +32,52 @@
 Param ([string]$keyRingId = 'dataprotectionprovider', [string]$keyId = 'key')
 
 # Check to see if the key ring already exists.
-$matchingKeyRing = (gcloud kms keyrings list --format json --location global --filter="name~.*/$keyRingId" | convertfrom-json).name
-if (-not $matchingKeyRing) {
+$matchingKeyRing = (gcloud kms keyrings list --format json --location global `
+    --filter="name~.*/$keyRingId" | convertfrom-json).name
+if ($matchingKeyRing) {
+    Write-Host "The key ring $matchingKeyRing already exists."
+} else { 
     # Create the new key ring.
     Write-Host "Creating new key ring $keyRingId..." 
     gcloud kms keyrings create $keyRingId --location global
 }
 
-# Create the new key.
-Write-Host "Creating new key $keyId..."
-gcloud kms keys create $keyId --location global --keyring $keyRingId --purpose=encryption
+# Check to see if the key already exists
+$matchingKey = (gcloud kms keys list --format json --location global `
+    --keyring $keyRingId --filter="name~.*/$keyRingId" | convertfrom-json).name
+if ($matchingKey) {
+    Write-Host "The key $matchingKey already exists."
+} else { 
+    # Create the new key.
+    Write-Host "Creating new key $keyId..."
+    gcloud kms keys create $keyId --location global --keyring $keyRingId --purpose=encryption
+}
+
 # Write the new key name to appsettings.json
 $keyName = (gcloud kms keys list --location global --keyring $keyRingId --format json | ConvertFrom-Json).name | Where-Object {$_ -like "*/$keyId" }
 $appsettings = Get-Content appsettings.json | ConvertFrom-Json
 $appsettings.DataProtection.KmsKeyName = $keyName
 ConvertTo-Json $appsettings | Out-File -Encoding utf8 -FilePath appsettings.json
 $keyName
+
+# Look up the app engine account email address and project name.
+$accounts = gcloud iam service-accounts list --format=json | ConvertFrom-Json
+$appEngineAccount = $accounts | `
+    Where-Object displayName -eq 'App Engine default service account'
+
+if (-not $appEngineAccount) {
+    throw "Could not find the App Engine Default service account in $accounts"
+}
+
+$email = $appEngineAccount.email
+$projectId = $appEngineAccount.projectId
+
+# Add Permissions for App Engine to encrypt and decrypt secrets for
+# Kms DataProtectionProvider.
+$roles = @('roles/cloudkms.admin', 'roles/cloudkms.cryptoKeyEncrypterDecrypter')
+foreach ($role in $roles) {
+    Write-Host "Adding role $role to $email for $keyRingId."
+    gcloud kms keyrings add-iam-policy-binding $keyRingId `
+        --project $projectId --location 'global' `
+        --member serviceAccount:$email --role $role
+}
