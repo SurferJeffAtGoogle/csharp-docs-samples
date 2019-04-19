@@ -29,7 +29,8 @@
 # .\New-EncryptionKey.ps1
 # projects/<your-project-id>/locations/global/keyRings/socialauth/cryptoKeys/appsecrets
 ##############################################################################
-Param ([string]$keyRingId = 'dataprotectionprovider', [string]$keyId = 'key')
+Param ([string]$keyRingId = 'dataprotectionprovider', [string]$keyId = 'key',
+    [string]$bucketName)
 
 # Check to see if the key ring already exists.
 $matchingKeyRing = (gcloud kms keyrings list --format json --location global `
@@ -57,7 +58,6 @@ if ($matchingKey) {
 $keyName = (gcloud kms keys list --location global --keyring $keyRingId --format json | ConvertFrom-Json).name | Where-Object {$_ -like "*/$keyId" }
 $appsettings = Get-Content appsettings.json | ConvertFrom-Json
 $appsettings.DataProtection.KmsKeyName = $keyName
-ConvertTo-Json $appsettings | Out-File -Encoding utf8 -FilePath appsettings.json
 $keyName
 
 # Look up the app engine account email address and project name.
@@ -81,3 +81,20 @@ foreach ($role in $roles) {
         --project $projectId --location 'global' `
         --member serviceAccount:$email --role $role
 }
+
+if (-not $bucketName) {
+    $bucketName = "$projectId-bucket"
+}
+
+# Check to see if the bucket already exists.
+$matchingBucket = (gsutil ls -b gs://$bucketName) 2> $null
+if ($matchingBucket) {
+    Write-Host "The bucket $bucketName already exists."
+} else {
+    # Create the bucket.
+    gsutil mb -p $projectId gs://$bucketName
+}
+
+$appsettings.DataProtection.Bucket = $bucketName
+ConvertTo-Json $appsettings | Out-File -Encoding utf8 -FilePath appsettings.json
+
