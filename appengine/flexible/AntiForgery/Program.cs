@@ -30,6 +30,7 @@ namespace AntiForgery
         internal static IWebHostBuilder UseDiagnostics(
             this IWebHostBuilder builder)
         {
+            // App Engine sets the following 3 environment variables.
             string projectId = Environment
                 .GetEnvironmentVariable("GOOGLE_CLOUD_PROJECT");
             if (!string.IsNullOrWhiteSpace(projectId)) {
