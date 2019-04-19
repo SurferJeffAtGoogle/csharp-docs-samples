@@ -14,7 +14,13 @@
 
 ##############################################################################
 #.SYNOPSIS
-# Create a new kms encryption key and store it in appsecrets.json.keyname
+# Runs all the gcloud commands necessary to run this sample.  Includes:
+# 1. Creating KMS keyring
+# 2. Creating KMS key
+# 3. Giving permission to the App Engine service account to encrypt and
+#    decrypt with the key.
+# 4. Creating a Google Cloud Storage bucket.
+# 5. Updating appsettings.json with names of key ring, key, and bucket.
 #
 #.PARAMETER keyRingId
 # The key ring id to store the key in.
@@ -22,12 +28,18 @@
 #.PARAMETER keyId
 # The id for the new key.
 #
+#.PARAMETER bucketName
+# The name of the bucket to use.
+#
+#.PARAMETER serviceAccountEmail
+# Instead of using the App Engine default service account, use this service
+# acccount.
+#
 #.OUTPUTS
-# The full name of the new key. 
+# Log of success and failure. 
 #
 #.EXAMPLE
-# .\New-EncryptionKey.ps1
-# projects/<your-project-id>/locations/global/keyRings/socialauth/cryptoKeys/appsecrets
+# .\SetUp.ps1
 ##############################################################################
 Param ([string]$keyRingId = 'dataprotectionprovider', [string]$keyId = 'key',
     [string]$bucketName, [string]$serviceAccountEmail)
