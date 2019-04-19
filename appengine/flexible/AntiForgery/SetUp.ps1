@@ -30,11 +30,28 @@
 # projects/<your-project-id>/locations/global/keyRings/socialauth/cryptoKeys/appsecrets
 ##############################################################################
 Param ([string]$keyRingId = 'dataprotectionprovider', [string]$keyId = 'key',
-    [string]$bucketName)
+    [string]$bucketName, [string]$serviceAccountEmail)
+
+if ($serviceAccountEmail) {
+    $email = $serviceAccountEmail
+    $email -match '[^@]+@([^\.]+).*' | Out-Null
+    $projectId = $matches[1]    
+} else {
+    # Look up the app engine account email address and project name.
+    $accounts = gcloud iam service-accounts list --format=json | ConvertFrom-Json
+    $appEngineAccount = $accounts | `
+        Where-Object displayName -eq 'App Engine default service account'
+
+    if (-not $appEngineAccount) {
+        throw "Could not find the App Engine Default service account in $accounts"
+    }
+    $email = $appEngineAccount.email
+    $projectId = $appEngineAccount.projectId
+}
 
 # Check to see if the key ring already exists.
 $matchingKeyRing = (gcloud kms keyrings list --format json --location global `
-    --filter="name~.*/$keyRingId" | convertfrom-json).name
+    --filter="name=projects/$projectId/locations/global/keyRings/$keyRingId" | convertfrom-json).name
 if ($matchingKeyRing) {
     Write-Host "The key ring $matchingKeyRing already exists."
 } else { 
@@ -45,7 +62,7 @@ if ($matchingKeyRing) {
 
 # Check to see if the key already exists
 $matchingKey = (gcloud kms keys list --format json --location global `
-    --keyring $keyRingId --filter="name~.*/$keyRingId" | convertfrom-json).name
+    --keyring $keyRingId --filter="name=projects/$projectId/locations/global/keyRings/$keyRingId/cryptoKeys/$keyId" | convertfrom-json).name
 if ($matchingKey) {
     Write-Host "The key $matchingKey already exists."
 } else { 
@@ -60,17 +77,6 @@ $appsettings = Get-Content appsettings.json | ConvertFrom-Json
 $appsettings.DataProtection.KmsKeyName = $keyName
 $keyName
 
-# Look up the app engine account email address and project name.
-$accounts = gcloud iam service-accounts list --format=json | ConvertFrom-Json
-$appEngineAccount = $accounts | `
-    Where-Object displayName -eq 'App Engine default service account'
-
-if (-not $appEngineAccount) {
-    throw "Could not find the App Engine Default service account in $accounts"
-}
-
-$email = $appEngineAccount.email
-$projectId = $appEngineAccount.projectId
 
 # Add Permissions for App Engine to encrypt and decrypt secrets for
 # Kms DataProtectionProvider.
