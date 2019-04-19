@@ -15,11 +15,32 @@
 var system = require('system');
 var host = system.env['CASPERJS11_URL'];
 
-casper.test.begin('AntiForgery World home page returns 200.', 1, function suite(test) {
+casper.test.begin('Test AntiForgery sample.', 5, function suite(test) {
     casper.start(host + '/', function (response) {
-        test.assertEquals(200, response.status);
+        console.log('Starting ' + host + '/');
+        test.assertSelectorHasText('H1', 'AntiForgery Example');
+        this.fill('#WhoForm', {
+            'Name': 'test.js',
+        }, false);
+        console.log("Filled form.");
     });
-    
+
+    casper.thenClick('#Submit', function (response) {
+        console.log('Submitted form.');
+        test.assertEquals(200, response.status);
+        test.assertSelectorHasText('h2', 'test.js');
+        this.fill('#WhoForm', {
+            'Name': 'anothertest.js',
+        }, false);
+        console.log("Filled another form.");
+    });
+
+    casper.thenClick('#Submit', function (response) {
+        console.log('Submitted form.');
+        test.assertEquals(200, response.status);
+        test.assertSelectorHasText('h2', 'anothertest.js');
+    });
+
     casper.run(function () {
         test.done();
     });

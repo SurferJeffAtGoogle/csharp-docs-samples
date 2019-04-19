@@ -14,6 +14,10 @@
 
 Import-Module -DisableNameChecking ..\..\..\BuildTools.psm1
 
-dotnet restore
-dotnet build
-Run-KestrelTest 5569 -CasperJs11
+Backup-File appsettings.json {
+    $email = (Get-Content $env:GOOGLE_APPLICATION_CREDENTIALS | ConvertFrom-Json).client_email
+    .\SetUp.ps1 -serviceAccountEmail $email
+    dotnet restore
+    dotnet build
+    Run-KestrelTest 5512 -CasperJs11
+}
