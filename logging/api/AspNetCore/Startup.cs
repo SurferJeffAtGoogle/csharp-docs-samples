@@ -37,7 +37,7 @@ namespace WebApp
             ILoggerFactory loggerFactory)
         {
             // Log to Google.
-            loggerFactory.AddGoogle("YOUR-PROJECT-ID");
+            loggerFactory.AddGoogle(app.ApplicationServices, "YOUR-PROJECT-ID");
             // [END logging_setup_aspnetcore_logger_factory]
 
             if (env.IsDevelopment())
@@ -47,8 +47,10 @@ namespace WebApp
 
             app.Run(async (context) =>
             {
+                var logger = app.ApplicationServices.GetService<ILogger<Startup>>();
+                logger.LogWarning("Hello logs!");
                 await context.Response.WriteAsync("Hello World!");
             });
-        }
+        }    
     }
 }
